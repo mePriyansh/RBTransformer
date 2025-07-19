@@ -1,0 +1,5 @@
+.ruff_cache
+venv
+ruff
+*__pycache__/
+*.ipynb
