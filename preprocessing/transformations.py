@@ -8,7 +8,9 @@ from typing import Callable, Dict, Union, List, Tuple
 #                                      BaseTransform Class                                          #
 #####################################################################################################
 class BaseTransform:
-    """Base class for all EEG data transformations."""
+    """
+    Base class for all EEG data transformations.
+    """
 
     def __init__(self):
         self._additional_targets: Dict[str, str] = {}
@@ -88,7 +90,9 @@ class BaseTransform:
 #                                       EEGTransform Class                                          #
 #####################################################################################################
 class EEGTransform(BaseTransform):
-    """Base class for EEG-specific transformations."""
+    """
+    Base class for EEG-specific transformations.
+    """
 
     def __init__(self, apply_to_baseline: bool = False):
         super(EEGTransform, self).__init__()
@@ -113,7 +117,9 @@ class EEGTransform(BaseTransform):
 #                                     LabelTransform Class                                          #
 #####################################################################################################
 class LabelTransform(BaseTransform):
-    """Base class for label-specific transformations."""
+    """
+    Base class for label-specific transformations.
+    """
 
     @property
     def targets(self):
@@ -128,7 +134,9 @@ class LabelTransform(BaseTransform):
 #                                BandDifferentialEntropy Class                                      #
 #####################################################################################################
 class BandDifferentialEntropy(EEGTransform):
-    """Computes the Band Differential Entropy (BDE) for EEG signals across predefined frequency bands."""
+    """
+    Computes the Band Differential Entropy (BDE) for EEG signals across predefined frequency bands.
+    """
 
     def __init__(
         self,
@@ -188,7 +196,9 @@ class BandDifferentialEntropy(EEGTransform):
 #                                    SubtractBaseline Class                                         #
 #####################################################################################################
 class SubtractBaseline(EEGTransform):
-    """Subtracts the baseline signal from corresponding trial EEG samples."""
+    """
+    Subtracts the baseline signal from corresponding trial EEG samples.
+    """
 
     def __init__(self):
         super(SubtractBaseline, self).__init__(apply_to_baseline=False)
@@ -218,7 +228,9 @@ class SubtractBaseline(EEGTransform):
 #                                     StackTransforms Class                                         #
 #####################################################################################################
 class StackTransforms(BaseTransform):
-    """Chains multiple preprocessing transforms and applies them sequentially."""
+    """
+    Chains multiple preprocessing transforms and applies them sequentially.
+    """
 
     def __init__(self, transforms: List[Callable]):
         super(StackTransforms, self).__init__()
@@ -246,7 +258,9 @@ class StackTransforms(BaseTransform):
 #                                        Lambda Class                                               #
 #####################################################################################################
 class Lambda(BaseTransform):
-    """Applies a custom transformation function to specified targets (EEG, baseline, or labels)."""
+    """
+    Applies a custom transformation function to specified targets (EEG, baseline, or labels).
+    """
 
     def __init__(self, lambda_fun: Callable, targets: List[str] = ["eeg", "baseline", "y"]):
         super(Lambda, self).__init__()
@@ -271,7 +285,9 @@ class Lambda(BaseTransform):
 #                                       Normalize Class                                             #
 #####################################################################################################
 class Normalize(EEGTransform):
-    """Applies Mean-Standard Deviation Normalization on EEG samples."""
+    """
+    Applies Mean-Standard Deviation Normalization on EEG samples.
+    """
 
     def __init__(
         self,
@@ -329,7 +345,9 @@ class Normalize(EEGTransform):
 #                                       Select Class                                                #
 #####################################################################################################
 class Select(LabelTransform):
-    """Extracts specified emotion dimension(s)—Valence, Arousal, or Dominance—from a label dictionary."""
+    """
+    Extracts specified emotion dimension(s)—Valence, Arousal, or Dominance—from a label dictionary.
+    """
     
     def __init__(self, key: Union[str, List]):
         super(Select, self).__init__()
@@ -355,7 +373,9 @@ class Select(LabelTransform):
 #                                       Binarize Class                                              #
 #####################################################################################################
 class Binarize(LabelTransform):
-    """Converts continuous emotion scores into high and low classes for a given threshold."""
+    """
+    Converts continuous emotion scores into high and low classes for a given threshold.
+    """
     
     def __init__(self, threshold: float):
         super(Binarize, self).__init__()
@@ -382,7 +402,9 @@ class Binarize(LabelTransform):
 #                                   UnsqueezeDim Class                                              #
 #####################################################################################################
 class UnsqueezeDim(EEGTransform):
-    """Adds a leading dimension to EEG samples, converting [channels, bands] to [1, channels, bands] for batching."""
+    """
+    Adds a leading dimension to EEG samples, converting [channels, bands] to [1, channels, bands] for batching.
+    """
     
     def __call__(
         self, *args, eeg: np.ndarray, baseline: Union[np.ndarray, None] = None, **kwargs
@@ -396,7 +418,9 @@ class UnsqueezeDim(EEGTransform):
 #                                       ToTensor Class                                              #
 #####################################################################################################
 class ToTensor(EEGTransform):
-    """Converts EEG data from NumPy arrays to PyTorch tensors."""
+    """
+    Converts EEG data from NumPy arrays to PyTorch tensors.
+    """
 
     def __init__(self, apply_to_baseline: bool = False):
         super(ToTensor, self).__init__(apply_to_baseline=apply_to_baseline)
@@ -413,7 +437,9 @@ class ToTensor(EEGTransform):
 #                                   DatasetReshape Class                                            #
 #####################################################################################################
 class DatasetReshape(Dataset):
-    """Reshapes flattened BDE features into [batch, channels, bands] format for model input."""
+    """
+    Reshapes flattened BDE features into [batch, channels, bands] format for model input.
+    """
 
     def __init__(self, X, y, num_channel=14):
         self.X = torch.tensor(
