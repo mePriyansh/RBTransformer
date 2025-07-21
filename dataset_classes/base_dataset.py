@@ -15,7 +15,9 @@ from transformations.functions import (
 )
 from typing import Any, Callable, Union, List, Tuple, Dict
 
-
+#####################################################################################################
+#                                      BASE DATASET-PREPROCESSING-CLASS                             #
+#####################################################################################################
 class BaseDataset(Dataset):
     """
     BaseDataset class for dataset preprocessing in RBTransformer.
@@ -83,7 +85,6 @@ class BaseDataset(Dataset):
                     self._eeg_memory[tag].update(data)
 
 
-
     def handle_record(
         self,
         record: Any,
@@ -124,7 +125,6 @@ class BaseDataset(Dataset):
                 infos.append(obj["info"])
 
         return infos, eegs
-
 
 
     def _yield_windows(
@@ -191,14 +191,12 @@ class BaseDataset(Dataset):
         return write_ptr
 
 
-
     def __len__(self) -> int:
         """
         Returns:
             int: Total number of preprocessed EEG windows in the dataset.
         """
         return len(self._info_memory)
-
 
 
     def __getitem__(self, index: int) -> Tuple:
