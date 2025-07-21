@@ -3,15 +3,13 @@ import pickle
 import scipy.io as scio
 from .base_dataset import BaseDataset
 from typing import Callable, Dict, Tuple, Union
-from transformations.functions import Compose, Lambda, Select, Binary
+from preprocessing.functions import StackTransforms, Lambda, Select, Binarize
 
 #####################################################################################################
 #                                    DREAMER-PREPROCESSING-CLASS                                    #
 #####################################################################################################
 class DREAMERDataset(BaseDataset):
-    """
-    Preprocessing Dataset class for DREAMER dataset for RBTransformer.
-    """
+    """Preprocessing Dataset class for DREAMER dataset for RBTransformer."""
 
     def __init__(
         self,
@@ -146,9 +144,9 @@ if __name__ == "__main__":
     #####################################################################################################
     #                            DREAMER-BINARY-VALENCE-DATASET-PREPROCESSING                           #
     #####################################################################################################  
-    label_transform = Compose([
+    label_transform = StackTransforms([
         Select('valence'),            
-        Binary(3.0), 
+        Binarize(3.0), 
     ])
 
     dreamer_binary_valence_dataset = DREAMERDataset(
@@ -169,9 +167,9 @@ if __name__ == "__main__":
     #####################################################################################################
     #                           DREAMER-BINARY-AROUSAL-DATASET-PREPROCESSING                            #
     #####################################################################################################
-    label_transform = Compose([
+    label_transform = StackTransforms([
         Select('arousal'),            
-        Binary(3.0), 
+        Binarize(3.0), 
     ])
 
     dreamer_binary_arousal_dataset = DREAMERDataset(
@@ -192,9 +190,9 @@ if __name__ == "__main__":
     #####################################################################################################
     #                           DREAMER-BINARY-DOMINANCE-DATASET-PREPROCESSING                          #
     #####################################################################################################
-    label_transform = Compose([
+    label_transform = StackTransforms([
         Select('dominance'),            
-        Binary(3.0),
+        Binarize(3.0),
     ])
 
     dreamer_binary_dominance_dataset = DREAMERDataset(
@@ -211,14 +209,14 @@ if __name__ == "__main__":
     filename = "preprocessed_datasets/dreamer_binary_dominance_dataset.pkl"
     with open(filename, "wb") as f:
         pickle.dump(dreamer_binary_dominance_dataset, f)
-
+        
     #####################################################################################################
     #                            DREAMER-MULTI-VALENCE-DATASET-PREPROCESSING                            #
     #####################################################################################################
     def transform_label(x):
         return int(x) - 1  
 
-    label_transform = Compose([
+    label_transform = StackTransforms([
         Select('valence'),            
         Lambda(transform_label)  
     ])
@@ -244,7 +242,7 @@ if __name__ == "__main__":
     def transform_label(x):
         return int(x) - 1  
 
-    label_transform = Compose([
+    label_transform = StackTransforms([
         Select('arousal'),            
         Lambda(transform_label)  
     ])
@@ -270,7 +268,7 @@ if __name__ == "__main__":
     def transform_label(x):
         return int(x) - 1  
 
-    label_transform = Compose([
+    label_transform = StackTransforms([
         Select('dominance'),            
         Lambda(transform_label)  
     ])
