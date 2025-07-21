@@ -213,12 +213,9 @@ if __name__ == "__main__":
     #####################################################################################################
     #                            DREAMER-MULTI-VALENCE-DATASET-PREPROCESSING                            #
     #####################################################################################################
-    def transform_label(x):
-        return int(x) - 1  
-
     label_transform = StackTransforms([
         Select('valence'),            
-        Lambda(transform_label)  
+        Lambda(lambda x: int(x) - 1)  
     ])
 
     dreamer_multi_valence_dataset = DREAMERDataset(
@@ -239,12 +236,9 @@ if __name__ == "__main__":
     #####################################################################################################
     #                            DREAMER-MULTI-AROUSAL-DATASET-PREPROCESSING                            #
     #####################################################################################################
-    def transform_label(x):
-        return int(x) - 1  
-
     label_transform = StackTransforms([
         Select('arousal'),            
-        Lambda(transform_label)  
+        Lambda(lambda x: int(x) - 1)  
     ])
 
     dreamer_multi_arousal_dataset = DREAMERDataset(
@@ -265,12 +259,9 @@ if __name__ == "__main__":
     #####################################################################################################
     #                           DREAMER-MULTI-DOMINANCE-DATASET-PREPROCESSING                           #
     #####################################################################################################
-    def transform_label(x):
-        return int(x) - 1  
-
     label_transform = StackTransforms([
         Select('dominance'),            
-        Lambda(transform_label)  
+        Lambda(lambda x: int(x) - 1)  
     ])
 
     dreamer_multi_dominance_dataset = DREAMERDataset(
