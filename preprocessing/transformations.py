@@ -415,15 +415,15 @@ class UnsqueezeDim(EEGTransform):
         return eeg[np.newaxis, ...]
 
 #####################################################################################################
-#                                       ToTensor Class                                              #
+#                                       Tensorize Class                                             #
 #####################################################################################################
-class ToTensor(EEGTransform):
+class Tensorize(EEGTransform):
     """
     Converts EEG data from NumPy arrays to PyTorch tensors.
     """
 
     def __init__(self, apply_to_baseline: bool = False):
-        super(ToTensor, self).__init__(apply_to_baseline=apply_to_baseline)
+        super(Tensorize, self).__init__(apply_to_baseline=apply_to_baseline)
 
     def __call__(
         self, *args, eeg: np.ndarray, baseline: Union[np.ndarray, None] = None, **kwargs
