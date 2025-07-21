@@ -204,12 +204,9 @@ if __name__ == "__main__":
     #####################################################################################################
     #                              DEAP-MULTI-VALENCE-DATASET-PREPROCESSING                             #  
     #####################################################################################################
-    def transform_label(x):
-        return int(x) - 1  
-
     label_transform = StackTransforms([
         Select('valence'),            
-        Lambda(transform_label)  
+        Lambda(lambda x: int(x) - 1)  
     ])
 
     deap_multi_valence_dataset = DEAPDataset(
@@ -230,12 +227,9 @@ if __name__ == "__main__":
     #####################################################################################################
     #                             DEAP-MULTI-AROUSAL-DATASET-PREPROCESSING                              #
     #####################################################################################################
-    def transform_label(x):
-        return int(x) - 1  
-
     label_transform = StackTransforms([
         Select('arousal'),            
-        Lambda(transform_label)  
+        Lambda(lambda x: int(x) - 1)  
     ])
 
     deap_multi_arousal_dataset = DEAPDataset(
@@ -256,12 +250,9 @@ if __name__ == "__main__":
     #####################################################################################################
     #                            DEAP-MULTI-DOMINANCE-DATASET-PREPROCESSING                             #
     #####################################################################################################
-    def transform_label(x):
-        return int(x) - 1  
-
     label_transform = StackTransforms([
         Select('dominance'),            
-        Lambda(transform_label)  
+        Lambda(lambda x: int(x) - 1)  
     ])
 
     deap_multi_dominance_dataset = DEAPDataset(
