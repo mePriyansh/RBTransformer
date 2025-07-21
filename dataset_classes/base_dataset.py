@@ -5,13 +5,13 @@ from tqdm.notebook import tqdm
 from tqdm_joblib import tqdm_joblib
 from joblib import Parallel, delayed
 from torch.utils.data import Dataset
-from transformations.functions import (
+from preprocessing.functions import (
     ToTensor,
-    MeanStdNormalize,
+    Normalize,
     BandDifferentialEntropy,
-    BaselineRemoval,
-    Compose,
-    To2d,
+    SubtractBaseline,
+    StackTransforms,
+    UnsqueezeDim,
 )
 from typing import Any, Callable, Union, List, Tuple, Dict
 
@@ -33,12 +33,12 @@ class BaseDataset(Dataset):
         self._info_memory: List[Dict] = []
         self.dataset_name = self.__class__.__name__.replace("Dataset", "")
         self.apply_to_baseline = self.num_baseline is not None and self.baseline_chunk_size is not None
-        self.offline_transform = Compose(
+        self.offline_transform = StackTransforms(
             [
-                MeanStdNormalize(apply_to_baseline=self.apply_to_baseline),
+                Normalize(apply_to_baseline=self.apply_to_baseline),
                 BandDifferentialEntropy(apply_to_baseline=self.apply_to_baseline),
-                BaselineRemoval(),
-                To2d(),
+                SubtractBaseline(),
+                UnsqueezeDim(),
             ]
         )
 
