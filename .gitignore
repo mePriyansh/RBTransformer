@@ -3,3 +3,4 @@ venv
 ruff
 *__pycache__/
 *.ipynb
+.env
