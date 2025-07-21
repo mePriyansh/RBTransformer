@@ -26,7 +26,7 @@ class BaseDataset(Dataset):
     def __init__(self, **kwargs):
         self.num_baseline = kwargs.get("num_baseline")
         self.baseline_chunk_size = kwargs.get("baseline_chunk_size")
-        self.online_transform = ToTensor()
+        self.to_tensor = ToTensor()
         self.label_transform = kwargs.get("label_transform")
         self.num_workers = kwargs.get("num_workers")
         self._eeg_memory: Dict[str, Dict[str, Any]] = defaultdict(dict)
@@ -225,9 +225,9 @@ class BaseDataset(Dataset):
         ):
             baseline_index = str(info["baseline_id"])
             baseline = self._eeg_memory[eeg_record][baseline_index]
-            signal = self.online_transform(eeg=eeg, baseline=baseline)["eeg"]
+            signal = self.to_tensor(eeg=eeg, baseline=baseline)["eeg"]
         else:
-            signal = self.online_transform(eeg=eeg)["eeg"]
+            signal = self.to_tensor(eeg=eeg)["eeg"]
 
         if self.label_transform:
             label = self.label_transform(y=info)["y"]
