@@ -1,9 +1,9 @@
 import os
-import numpy as np
 import pickle
+import numpy as np
 from .base_dataset import BaseDataset
-from typing import Callable, Dict, Tuple, Union
-from transformations.functions import Compose, Lambda, Select, Binary
+from typing import Callable, Dict, Union
+from preprocessing.functions import StackTransforms, Lambda, Select, Binarize
 
 #####################################################################################################
 #                                      DEAP-PREPROCESSING-CLASS                                     #
@@ -135,9 +135,9 @@ if __name__ == "__main__":
     #####################################################################################################
     #                             DEAP-BINARY-VALENCE-DATASET-PREPROCESSING                             #
     #####################################################################################################  
-    label_transform = Compose([
+    label_transform = StackTransforms([
         Select('valence'),            
-        Binary(5.0), 
+        Binarize(5.0), 
     ])
 
     deap_binary_valence_dataset = DEAPDataset(
@@ -158,9 +158,9 @@ if __name__ == "__main__":
     #####################################################################################################
     #                             DEAP-BINARY-AROUSAL-DATASET-PREPROCESSING                             #
     #####################################################################################################
-    label_transform = Compose([
+    label_transform = StackTransforms([
         Select('arousal'),            
-        Binary(5.0), 
+        Binarize(5.0), 
     ])
 
     deap_binary_arousal_dataset = DEAPDataset(
@@ -181,9 +181,9 @@ if __name__ == "__main__":
     #####################################################################################################
     #                            DEAP-BINARY-DOMINANCE-DATASET-PREPROCESSING                            #
     #####################################################################################################
-    label_transform = Compose([
+    label_transform = StackTransforms([
         Select('dominance'),            
-        Binary(5.0),
+        Binarize(5.0),
     ])
 
     deap_binary_dominance_dataset = DEAPDataset(
@@ -207,7 +207,7 @@ if __name__ == "__main__":
     def transform_label(x):
         return int(x) - 1  
 
-    label_transform = Compose([
+    label_transform = StackTransforms([
         Select('valence'),            
         Lambda(transform_label)  
     ])
@@ -233,7 +233,7 @@ if __name__ == "__main__":
     def transform_label(x):
         return int(x) - 1  
 
-    label_transform = Compose([
+    label_transform = StackTransforms([
         Select('arousal'),            
         Lambda(transform_label)  
     ])
@@ -259,7 +259,7 @@ if __name__ == "__main__":
     def transform_label(x):
         return int(x) - 1  
 
-    label_transform = Compose([
+    label_transform = StackTransforms([
         Select('dominance'),            
         Lambda(transform_label)  
     ])
