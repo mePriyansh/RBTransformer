@@ -438,12 +438,11 @@ class Tensorize(EEGTransform):
 #####################################################################################################
 class DatasetReshape(Dataset):
     """
-    Reshapes flattened BDE features into [batch, channels, bands] format for model input.
+    Reshapes flattened BDE features into [batch, num_electrodes, bands] format for model input.
     """
-
-    def __init__(self, X, y, num_channel=14):
+    def __init__(self, X, y, num_electrodes=14):
         self.X = torch.tensor(
-            X.reshape(-1, num_channel, 4), dtype=torch.float32
+            X.reshape(-1, num_electrodes, 4), dtype=torch.float32
         ).squeeze(1)
         self.y = torch.tensor(y, dtype=torch.long)
 
@@ -452,8 +451,6 @@ class DatasetReshape(Dataset):
 
     def __getitem__(self, idx):
         return self.X[idx], self.y[idx]
-
-
 
 
 
