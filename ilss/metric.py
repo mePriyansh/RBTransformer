@@ -9,20 +9,20 @@ class ILSS:
 
     ILSS penalizes high variance and rewards consistently high-performing models by computing:
 
-        ILSS = sqrt(μ / 10) * min( -log10(σ / (1 + λ * μ^2.5) + ε), 10 )
+        ILSS = (sqrt(μ) / 10) * min( -log10(σ / (1 + λ * μ^2.5) + ε), 10 )
 
     Where:
         - μ is the mean accuracy across folds (in percent),
         - σ is the standard deviation across folds,
         - λ is a scaling factor (default: 71),
         - ε is a small constant to avoid log(0) (default: 1e-10),
-        - The min(..., 10) caps the score at 10.
+        - The min(..., 10) caps the stability score at 10 to prevent runaway values at low σ.
 
     The final ILSS score is bounded between 0 and 10, where:
         - 0 implies poor stability (low accuracy or high variance),
-        - 10 implies excellent stability (high accuracy and very low variance).
+        - 10 implies excellent stability (high accuracy and minimal variance).
 
-    Higher ILSS scores indicate greater model stability and reliability across folds.
+    Higher ILSS scores indicate greater model stability and consistency across folds.
     """
 
     def __init__(self, lambda_: float = 71, epsilon: float = 1e-10):
@@ -49,10 +49,10 @@ class ILSS:
         """
         numerator = std_dev
         denominator = 1 + self.lambda_ * (mean_accuracy ** 2.5)
-        log_term = np.log10(numerator / denominator + self.epsilon)
+        log_term = np.log10((numerator / denominator) + self.epsilon)
         ilss_uncapped = -log_term
         ilss_capped = min(ilss_uncapped, 10)
-        return np.sqrt(mean_accuracy / 10) * ilss_capped
+        return np.sqrt(mean_accuracy) / 10 * ilss_capped
 
 
 if __name__ == "__main__":
