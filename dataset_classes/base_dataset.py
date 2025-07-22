@@ -5,7 +5,7 @@ from tqdm.notebook import tqdm
 from tqdm_joblib import tqdm_joblib
 from joblib import Parallel, delayed
 from torch.utils.data import Dataset
-from preprocessing.functions import (
+from preprocessing.transformations import (
     Tensorize,
     Normalize,
     BandDifferentialEntropy,
@@ -13,7 +13,7 @@ from preprocessing.functions import (
     StackTransforms,
     UnsqueezeDim,
 )
-from typing import Any, Callable, Union, List, Tuple, Dict
+from typing import Any, Callable, List, Tuple, Dict
 
 #####################################################################################################
 #                                      BASE DATASET-PREPROCESSING-CLASS                             #

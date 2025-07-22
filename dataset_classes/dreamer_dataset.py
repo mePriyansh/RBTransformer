@@ -1,9 +1,9 @@
 import os
 import pickle
 import scipy.io as scio
-from .base_dataset import BaseDataset
-from typing import Callable, Dict, Tuple, Union
-from preprocessing.functions import StackTransforms, Lambda, Select, Binarize
+from base_dataset import BaseDataset
+from typing import Callable, Dict, Union
+from preprocessing.transformations import StackTransforms, Lambda, Select, Binarize
 
 #####################################################################################################
 #                                    DREAMER-PREPROCESSING-CLASS                                    #

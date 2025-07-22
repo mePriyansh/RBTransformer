@@ -1,9 +1,9 @@
 import os
 import pickle
 import numpy as np
-from .base_dataset import BaseDataset
+from base_dataset import BaseDataset
 from typing import Callable, Dict, Union
-from preprocessing.functions import StackTransforms, Lambda, Select, Binarize
+from preprocessing.transformations import StackTransforms, Lambda, Select, Binarize
 
 #####################################################################################################
 #                                      DEAP-PREPROCESSING-CLASS                                     #
