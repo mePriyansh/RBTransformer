@@ -330,5 +330,6 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(range(len(y_full)))):
         repo_id=f"{base_repo_id}-{fold+1}",
         commit_message=f"Upload of trained RBTransformer on Kfold-{fold+1} run"
     )
+    
     wandb.finish()
 
