@@ -33,7 +33,7 @@ class BaseDataset(Dataset):
         self._info_memory: List[Dict] = []
         self.dataset_name = self.__class__.__name__.replace("Dataset", "")
         self.apply_to_baseline = self.num_baseline is not None and self.baseline_chunk_size is not None
-        self.offline_transform = StackTransforms(
+        self.preprocessing_transformations = StackTransforms(
             [
                 Normalize(apply_to_baseline=self.apply_to_baseline),
                 BandDifferentialEntropy(apply_to_baseline=self.apply_to_baseline),
@@ -166,11 +166,11 @@ class BaseDataset(Dataset):
             clip = trial_samples[:, start_at:end_at]
 
             if baseline_sample is not None:
-                transformed = self.offline_transform(eeg=clip, baseline=baseline_sample)
+                transformed = self.preprocessing_transformations(eeg=clip, baseline=baseline_sample)
                 t_eeg = transformed["eeg"]
                 t_baseline = transformed["baseline"]
             else:
-                t_eeg = self.offline_transform(eeg=clip)["eeg"]
+                t_eeg = self.preprocessing_transformations(eeg=clip)["eeg"]
 
             if not baseline_done:
                 baseline_id = f"{record_prefix}_{write_ptr}"
