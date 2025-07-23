@@ -1,19 +1,20 @@
 import os
 import torch
 import wandb
-import random
 import pickle
 import numpy as np
 import torch.nn as nn
 from tqdm import tqdm
 from dotenv import load_dotenv
 from collections import Counter
+from utils.seed import set_seed
 from huggingface_hub import login
 from model.model import RBTransformer
 from torch.utils.data import DataLoader
 from preprocessing import DatasetReshape
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import KFold
+from utils.push_to_hf import push_model_to_hub
 import torch.optim.lr_scheduler as lr_scheduler
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
@@ -73,13 +74,7 @@ print(f"Loaded dataset from {dataset_path}")
 # SEED CONFIG 
 ################################################################################
 SEED = 23
-random.seed(SEED)
-np.random.seed(SEED)
-torch.manual_seed(SEED)
-
-if torch.cuda.is_available():
-    torch.cuda.manual_seed(SEED)
-    torch.cuda.manual_seed_all(SEED)
+set_seed(SEED)
 
 
 ################################################################################
@@ -139,10 +134,7 @@ login(token=HF_TOKEN)
 
 username = "<YOUR_USERNAME>"
 base_repo_id = f"{username}/{dataset_name}-{benchmark_column}-{task_type}-Kfold"
-def push_model_to_hub(model, repo_id, local_dir="rbtransformer", commit_message="Upload RBTransformer model"):
-    model.save_pretrained(local_dir)
-    model.push_to_hub(repo_id=repo_id, commit_message=commit_message)
-    print(f"Model successfully uploaded to https://huggingface.co/{repo_id}")
+
 
 ################################################################################
 # REGULARIZATION: DATA DROPOUT
