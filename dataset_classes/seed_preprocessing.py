@@ -2,18 +2,18 @@ import os
 import pickle
 import numpy as np
 import scipy.io as scio
-from base_dataset import BaseDataset
+from dataset_classes.base_preprocessing import BaseDatasetPreprocessing
 from typing import Callable, Dict, Union
 from preprocessing.transformations import StackTransforms, Lambda, Select
 
 
-class SEEDDataset(BaseDataset):
+class SEED(BaseDatasetPreprocessing):
     """Preprocessing Dataset class for SEED dataset for RBTransformer."""
 
     def __init__(
         self,
         root_path: str = "./Preprocessed_EEG",
-        num_channel: int = 62,
+        num_channels: int = 62,
         trial_window_size: int = 512,
         stride: int = 117,
         num_baseline: Union[int, None] = None,
@@ -23,7 +23,7 @@ class SEEDDataset(BaseDataset):
     ):
         super().__init__(
             root_path=root_path,
-            num_channel=num_channel,
+            num_channels=num_channels,
             chunk_size=trial_window_size,
             stride=stride,
             num_baseline=num_baseline,
@@ -61,7 +61,7 @@ class SEEDDataset(BaseDataset):
         labels: np.ndarray,
         trial_window_size: int = 512,
         stride: int = 117,
-        num_channel: int = 62,
+        num_channels: int = 62,
         **kwargs,
     ):
         """
@@ -73,7 +73,7 @@ class SEEDDataset(BaseDataset):
             labels (np.ndarray): Emotion labels for each trial.
             trial_window_size (int): Length of each trial segment.
             stride (int): Step size between segments.
-            num_channel (int): Number of EEG channels.
+            num_channels (int): Number of EEG channels.
 
         Yields:
             dict: For trial segments, returns {'eeg', 'key', 'info'}.
@@ -86,7 +86,7 @@ class SEEDDataset(BaseDataset):
         trial_ids = [key for key in samples.keys() if "eeg" in key]
 
         for trial_id in trial_ids:
-            trial_samples = samples[trial_id][:num_channel]
+            trial_samples = samples[trial_id][:num_channels]
 
             trial_meta_info = {
                 "subject_id": subject_id,
@@ -133,10 +133,10 @@ if __name__ == "__main__":
         Lambda(lambda x: x + 1)
     ])
 
-    seed_multi_dataset = SEEDDataset(
+    seed_multi_dataset = SEED(
         root_path='./Preprocessed_EEG',
         trial_window_size=512,
-        num_channel=14,
+        num_channels=14,
         stride=117,
         label_transform=label_transform,
         num_workers=8

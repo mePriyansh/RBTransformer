@@ -1,5 +1,5 @@
-from .deap_dataset import DEAPDataset
-from .dreamer_dataset import DREAMERDataset
-from .seed_dataset import SEEDDataset
+from .deap_preprocessing import DEAP
+from .dreamer_preprocessing import DREAMER
+from .seed_preprocessing import SEED
 
-__all__ = ["DEAPDataset", "DREAMERDataset", "SEEDDataset"]
+__all__ = ["DEAP", "DREAMER", "SEED"]

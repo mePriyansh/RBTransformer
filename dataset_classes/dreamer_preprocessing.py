@@ -1,14 +1,14 @@
 import os
 import pickle
 import scipy.io as scio
-from base_dataset import BaseDataset
+from dataset_classes.base_preprocessing import BaseDatasetPreprocessing
 from typing import Callable, Dict, Union
 from preprocessing.transformations import StackTransforms, Lambda, Select, Binarize
 
 #####################################################################################################
 #                                    DREAMER-PREPROCESSING-CLASS                                    #
 #####################################################################################################
-class DREAMERDataset(BaseDataset):
+class DREAMER(BaseDatasetPreprocessing):
     """Preprocessing Dataset class for DREAMER dataset for RBTransformer."""
 
     def __init__(
@@ -16,7 +16,7 @@ class DREAMERDataset(BaseDataset):
         root_path: str = "./DREAMER.mat",
         trial_window_size: int = 512,
         baseline_window_size: int = 128,
-        num_channel: int = 14,
+        num_channels: int = 14,
         num_baseline: int = 61,
         stride: int = 117,
         label_transform: Union[None, Callable] = None,
@@ -24,7 +24,7 @@ class DREAMERDataset(BaseDataset):
     ):
         super().__init__(
             root_path=root_path,
-            num_channel=num_channel,
+            num_channels=num_channels,
             num_baseline=num_baseline,
             stride=stride,
             chunk_size=trial_window_size,
@@ -54,7 +54,7 @@ class DREAMERDataset(BaseDataset):
         record: str,
         mat_data: Dict,
         trial_window_size: int = 512,
-        num_channel: int = 14,
+        num_channels: int = 14,
         num_baseline: int = 61,
         stride: int = 117,
         baseline_window_size: int = 128,
@@ -67,7 +67,7 @@ class DREAMERDataset(BaseDataset):
             record (str): Record identifier (subject index).
             mat_data (Dict): Parsed .mat content from the DREAMER dataset.
             trial_window_size (int): Length of each trial segment.
-            num_channel (int): Number of EEG channels.
+            num_channels (int): Number of EEG channels.
             num_baseline (int): Number of baseline segments.
             stride (int): Step size between segments.
             baseline_window_size (int): Length of each baseline segment.
@@ -86,12 +86,12 @@ class DREAMERDataset(BaseDataset):
             trial_baseline_sample = mat_data["DREAMER"][0, 0]["Data"][0, subject][
                 "EEG"
             ][0, 0]["baseline"][0, 0][trial_id, 0]
-            trial_baseline_sample = trial_baseline_sample[:, :num_channel].swapaxes(
+            trial_baseline_sample = trial_baseline_sample[:, :num_channels].swapaxes(
                 1, 0
             )
             trial_baseline_sample = (
                 trial_baseline_sample[:, : num_baseline * baseline_window_size]
-                .reshape(num_channel, num_baseline, baseline_window_size)
+                .reshape(num_channels, num_baseline, baseline_window_size)
                 .mean(axis=1)
             )
 
@@ -112,7 +112,7 @@ class DREAMERDataset(BaseDataset):
             trial_samples = mat_data["DREAMER"][0, 0]["Data"][0, subject]["EEG"][0, 0][
                 "stimuli"
             ][0, 0][trial_id, 0]
-            trial_samples = trial_samples[:, :num_channel].swapaxes(1, 0)
+            trial_samples = trial_samples[:, :num_channels].swapaxes(1, 0)
 
             write_pointer = yield from self._yield_windows(
                 trial_samples=trial_samples,
@@ -149,11 +149,11 @@ if __name__ == "__main__":
         Binarize(3.0), 
     ])
 
-    dreamer_binary_valence_dataset = DREAMERDataset(
+    dreamer_binary_valence_dataset = DREAMER(
         root_path='./DREAMER.mat',
         trial_window_size=512,
         baseline_window_size=128,
-        num_channel=14,
+        num_channels=14,
         num_baseline=61,
         stride=117,
         label_transform=label_transform,
@@ -172,11 +172,11 @@ if __name__ == "__main__":
         Binarize(3.0), 
     ])
 
-    dreamer_binary_arousal_dataset = DREAMERDataset(
+    dreamer_binary_arousal_dataset = DREAMER(
         root_path='./DREAMER.mat',
         trial_window_size=512,
         baseline_window_size=128,
-        num_channel=14,
+        num_channels=14,
         num_baseline=61,
         stride=117,
         label_transform=label_transform,
@@ -195,11 +195,11 @@ if __name__ == "__main__":
         Binarize(3.0),
     ])
 
-    dreamer_binary_dominance_dataset = DREAMERDataset(
+    dreamer_binary_dominance_dataset = DREAMER(
         root_path='./DREAMER.mat',
         trial_window_size=512,
         baseline_window_size=128,
-        num_channel=14,
+        num_channels=14,
         num_baseline=61,
         stride=117,
         label_transform=label_transform,
@@ -218,11 +218,11 @@ if __name__ == "__main__":
         Lambda(lambda x: int(x) - 1)  
     ])
 
-    dreamer_multi_valence_dataset = DREAMERDataset(
+    dreamer_multi_valence_dataset = DREAMER(
         root_path='./DREAMER.mat',
         trial_window_size=512,
         baseline_window_size=128,
-        num_channel=14,
+        num_channels=14,
         num_baseline=61,
         stride=117,
         label_transform=label_transform,
@@ -241,11 +241,11 @@ if __name__ == "__main__":
         Lambda(lambda x: int(x) - 1)  
     ])
 
-    dreamer_multi_arousal_dataset = DREAMERDataset(
+    dreamer_multi_arousal_dataset = DREAMER(
         root_path='./DREAMER.mat',
         trial_window_size=512,
         baseline_window_size=128,
-        num_channel=14,
+        num_channels=14,
         num_baseline=61,
         stride=117,
         label_transform=label_transform,
@@ -264,11 +264,11 @@ if __name__ == "__main__":
         Lambda(lambda x: int(x) - 1)  
     ])
 
-    dreamer_multi_dominance_dataset = DREAMERDataset(
+    dreamer_multi_dominance_dataset = DREAMER(
         root_path='./DREAMER.mat',
         trial_window_size=512,
         baseline_window_size=128,
-        num_channel=14,
+        num_channels=14,
         num_baseline=61,
         stride=117,
         label_transform=label_transform,

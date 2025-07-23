@@ -1,14 +1,14 @@
 import os
 import pickle
 import numpy as np
-from base_dataset import BaseDataset
+from dataset_classes.base_preprocessing import BaseDatasetPreprocessing
 from typing import Callable, Dict, Union
 from preprocessing.transformations import StackTransforms, Lambda, Select, Binarize
 
 #####################################################################################################
 #                                      DEAP-PREPROCESSING-CLASS                                     #
 #####################################################################################################
-class DEAPDataset(BaseDataset):
+class DEAP(BaseDatasetPreprocessing):
     """
     Preprocessing Dataset class for DEAP dataset for RBTransformer.
     """
@@ -17,7 +17,7 @@ class DEAPDataset(BaseDataset):
         root_path: str = "./data_preprocessed_python",
         trial_window_size: int = 512,
         baseline_window_size: int = 128,
-        num_channel: int = 32,
+        num_channels: int = 32,
         num_baseline: int = 3,
         stride: int = 117,
         label_transform: Union[None, Callable] = None,
@@ -25,10 +25,10 @@ class DEAPDataset(BaseDataset):
     ):
         super().__init__(
             root_path=root_path,
-            num_channel=num_channel,
+            num_channels=num_channels,
             num_baseline=num_baseline,
             chunk_size=trial_window_size,
-            baseline_chunk_size=baseline_window_size,
+            baseline_window_size=baseline_window_size,
             stride=stride,
             label_transform=label_transform,
             num_workers=num_workers,
@@ -63,7 +63,7 @@ class DEAPDataset(BaseDataset):
         labels: np.ndarray,
         trial_window_size: int = 512,
         stride: int = 117,
-        num_channel: int = 32,
+        num_channels: int = 32,
         num_baseline: int = 3,
         baseline_window_size: int = 128,
         **kwargs,
@@ -77,7 +77,7 @@ class DEAPDataset(BaseDataset):
             labels (np.ndarray): Valence, arousal, dominance, and liking scores.
             trial_window_size (int): Length of each trial segment.
             stride (int): Step size between segments.
-            num_channel (int): Number of EEG channels.
+            num_channels (int): Number of EEG channels.
             num_baseline (int): Number of baseline segments.
             baseline_window_size (int): Length of each baseline segment.
 
@@ -89,13 +89,13 @@ class DEAPDataset(BaseDataset):
         write_pointer = 0
 
         for trial_id in range(len(samples)):
-            trial_samples = samples[trial_id, :num_channel]
+            trial_samples = samples[trial_id, :num_channels]
 
             trial_baseline_sample = trial_samples[
                 :, : baseline_window_size * num_baseline
             ]
             trial_baseline_sample = trial_baseline_sample.reshape(
-                num_channel, num_baseline, baseline_window_size
+                num_channels, num_baseline, baseline_window_size
             ).mean(axis=1)
 
             trial_meta_info = {"subject_id": subject_id, "trial_id": trial_id}
@@ -140,11 +140,11 @@ if __name__ == "__main__":
         Binarize(5.0), 
     ])
 
-    deap_binary_valence_dataset = DEAPDataset(
+    deap_binary_valence_dataset = DEAP(
         root_path="./data_preprocessed_python",
         trial_window_size=512,
         baseline_window_size=128,
-        num_channel=32,
+        num_channels=32,
         num_baseline=3,
         stride=117,
         label_transform=label_transform,
@@ -163,11 +163,11 @@ if __name__ == "__main__":
         Binarize(5.0), 
     ])
 
-    deap_binary_arousal_dataset = DEAPDataset(
+    deap_binary_arousal_dataset = DEAP(
         root_path="./data_preprocessed_python",
         trial_window_size=512,
         baseline_window_size=128,
-        num_channel=32,
+        num_channels=32,
         num_baseline=3,
         stride=117,
         label_transform=label_transform,
@@ -186,11 +186,11 @@ if __name__ == "__main__":
         Binarize(5.0),
     ])
 
-    deap_binary_dominance_dataset = DEAPDataset(
+    deap_binary_dominance_dataset = DEAP(
         root_path="./data_preprocessed_python",
         trial_window_size=512,
         baseline_window_size=128,
-        num_channel=32,
+        num_channels=32,
         num_baseline=3,
         stride=117,
         label_transform=label_transform,
@@ -209,11 +209,11 @@ if __name__ == "__main__":
         Lambda(lambda x: int(x) - 1)  
     ])
 
-    deap_multi_valence_dataset = DEAPDataset(
+    deap_multi_valence_dataset = DEAP(
         root_path="./data_preprocessed_python",
         trial_window_size=512,
         baseline_window_size=128,
-        num_channel=32,
+        num_channels=32,
         num_baseline=3,
         stride=117,
         label_transform=label_transform,
@@ -232,11 +232,11 @@ if __name__ == "__main__":
         Lambda(lambda x: int(x) - 1)  
     ])
 
-    deap_multi_arousal_dataset = DEAPDataset(
+    deap_multi_arousal_dataset = DEAP(
         root_path="./data_preprocessed_python",
         trial_window_size=512,
         baseline_window_size=128,
-        num_channel=32,
+        num_channels=32,
         num_baseline=3,
         stride=117,
         label_transform=label_transform,
@@ -255,11 +255,11 @@ if __name__ == "__main__":
         Lambda(lambda x: int(x) - 1)  
     ])
 
-    deap_multi_dominance_dataset = DEAPDataset(
+    deap_multi_dominance_dataset = DEAP(
         root_path="./data_preprocessed_python",
         trial_window_size=512,
         baseline_window_size=128,
-        num_channel=32,
+        num_channels=32,
         num_baseline=3,
         stride=117,
         label_transform=label_transform,

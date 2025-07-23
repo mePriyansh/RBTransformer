@@ -18,21 +18,21 @@ from typing import Any, Callable, List, Tuple, Dict
 #####################################################################################################
 #                                      BASE DATASET-PREPROCESSING-CLASS                             #
 #####################################################################################################
-class BaseDataset(Dataset):
+class BaseDatasetPreprocessing(Dataset):
     """
-    BaseDataset class for dataset preprocessing in RBTransformer.
-    Subclassed by SEEDDataset, DEAPDataset, and DREAMERDataset.
+    BaseDatasetPreprocessing class for dataset preprocessing in RBTransformer.
+    Subclassed by SEED, DEAP, and DREAMER.
     """
     def __init__(self, **kwargs):
         self.num_baseline = kwargs.get("num_baseline")
-        self.baseline_chunk_size = kwargs.get("baseline_chunk_size")
+        self.baseline_window_size = kwargs.get("baseline_window_size")
         self.tensorize = Tensorize()
         self.label_transform = kwargs.get("label_transform")
         self.num_workers = kwargs.get("num_workers")
         self._eeg_memory: Dict[str, Dict[str, Any]] = defaultdict(dict)
         self._info_memory: List[Dict] = []
         self.dataset_name = self.__class__.__name__.replace("Dataset", "")
-        self.apply_to_baseline = self.num_baseline is not None and self.baseline_chunk_size is not None
+        self.apply_to_baseline = self.num_baseline is not None and self.baseline_window_size is not None
         self.preprocessing_transformations = StackTransforms(
             [
                 Normalize(apply_to_baseline=self.apply_to_baseline),
@@ -220,7 +220,7 @@ class BaseDataset(Dataset):
 
         if (
             self.num_baseline is not None
-            and self.baseline_chunk_size is not None
+            and self.baseline_window_size is not None
             and "baseline_id" in info
         ):
             baseline_index = str(info["baseline_id"])
