@@ -3,7 +3,7 @@ import pickle
 import scipy.io as scio
 from dataset_classes.base_preprocessing import BaseDatasetPreprocessing
 from typing import Callable, Dict, Union
-from preprocessing.transformations import StackTransforms, Lambda, Select, Binarize
+from preprocessing.transformations import StackTransforms, Lambda, Select, Binarize, subtract_by_one
 
 
 #####################################################################################################
@@ -215,7 +215,7 @@ if __name__ == "__main__":
     #####################################################################################################
     #                            DREAMER-MULTI-VALENCE-DATASET-PREPROCESSING                            #
     #####################################################################################################
-    label_transform = StackTransforms([Select("valence"), Lambda(lambda x: int(x) - 1)])
+    label_transform = StackTransforms([Select("valence"), Lambda(subtract_by_one)])
 
     dreamer_multi_valence_dataset = DREAMER(
         root_path="./DREAMER.mat",
@@ -235,7 +235,7 @@ if __name__ == "__main__":
     #####################################################################################################
     #                            DREAMER-MULTI-AROUSAL-DATASET-PREPROCESSING                            #
     #####################################################################################################
-    label_transform = StackTransforms([Select("arousal"), Lambda(lambda x: int(x) - 1)])
+    label_transform = StackTransforms([Select("arousal"), Lambda(subtract_by_one)])
 
     dreamer_multi_arousal_dataset = DREAMER(
         root_path="./DREAMER.mat",
@@ -256,7 +256,7 @@ if __name__ == "__main__":
     #                           DREAMER-MULTI-DOMINANCE-DATASET-PREPROCESSING                           #
     #####################################################################################################
     label_transform = StackTransforms(
-        [Select("dominance"), Lambda(lambda x: int(x) - 1)]
+        [Select("dominance"), Lambda(subtract_by_one)]
     )
 
     dreamer_multi_dominance_dataset = DREAMER(

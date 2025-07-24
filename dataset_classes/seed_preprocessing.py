@@ -4,7 +4,7 @@ import numpy as np
 import scipy.io as scio
 from dataset_classes.base_preprocessing import BaseDatasetPreprocessing
 from typing import Callable, Dict, Union
-from preprocessing.transformations import StackTransforms, Lambda, Select
+from preprocessing.transformations import StackTransforms, Lambda, Select, add_by_one
 
 
 class SEED(BaseDatasetPreprocessing):
@@ -121,7 +121,11 @@ if __name__ == "__main__":
     #####################################################################################################
     #                                  SEED-MULTI-DATASET-PREPROCESSING                                 #
     #####################################################################################################
-    label_transform = StackTransforms([Select("emotion"), Lambda(lambda x: x + 1)])
+    label_transform = StackTransforms(
+        [
+            Select("emotion"), 
+            Lambda(add_by_one)
+         ])
 
     seed_multi_dataset = SEED(
         root_path="./Preprocessed_EEG",
