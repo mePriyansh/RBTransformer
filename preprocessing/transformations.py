@@ -4,6 +4,7 @@ from torch.utils.data import Dataset
 from scipy.signal import butter, lfilter
 from typing import Callable, Dict, Union, List, Tuple
 
+
 #####################################################################################################
 #                                      BaseTransform Class                                          #
 #####################################################################################################
@@ -86,6 +87,7 @@ class BaseTransform:
         format_string += ")"
         return format_string
 
+
 #####################################################################################################
 #                                       EEGTransform Class                                          #
 #####################################################################################################
@@ -113,6 +115,7 @@ class EEGTransform(BaseTransform):
     def repr_body(self) -> Dict:
         return dict(super().repr_body, **{"apply_to_baseline": self.apply_to_baseline})
 
+
 #####################################################################################################
 #                                     LabelTransform Class                                          #
 #####################################################################################################
@@ -129,6 +132,7 @@ class LabelTransform(BaseTransform):
         raise NotImplementedError(
             "Method apply is not implemented in class " + self.__class__.__name__
         )
+
 
 #####################################################################################################
 #                                BandDifferentialEntropy Class                                      #
@@ -165,7 +169,9 @@ class BandDifferentialEntropy(EEGTransform):
         for low, high in self.band_dict.values():
             c_list = []
             for c in eeg:
-                b, a = self._butter_bandpass(low, high, fs=self.sampling_rate, order=self.order)
+                b, a = self._butter_bandpass(
+                    low, high, fs=self.sampling_rate, order=self.order
+                )
                 c_list.append(self._calculate_differential_entropy(lfilter(b, a, c)))
             c_list = np.array(c_list)
             band_list.append(c_list)
@@ -191,6 +197,7 @@ class BandDifferentialEntropy(EEGTransform):
                 "band_dict": {...},
             },
         )
+
 
 #####################################################################################################
 #                                    SubtractBaseline Class                                         #
@@ -224,6 +231,7 @@ class SubtractBaseline(EEGTransform):
     def get_params_dependent_on_targets(self, params):
         return {"baseline": params["baseline"]}
 
+
 #####################################################################################################
 #                                     StackTransforms Class                                         #
 #####################################################################################################
@@ -254,6 +262,7 @@ class StackTransforms(BaseTransform):
         format_string += "\n)"
         return format_string
 
+
 #####################################################################################################
 #                                        Lambda Class                                               #
 #####################################################################################################
@@ -262,7 +271,9 @@ class Lambda(BaseTransform):
     Applies a custom transformation function to specified targets (EEG, baseline, or labels).
     """
 
-    def __init__(self, lambda_fun: Callable, targets: List[str] = ["eeg", "baseline", "y"]):
+    def __init__(
+        self, lambda_fun: Callable, targets: List[str] = ["eeg", "baseline", "y"]
+    ):
         super(Lambda, self).__init__()
         self._targets = targets
         self.lambda_fun = lambda_fun
@@ -279,7 +290,10 @@ class Lambda(BaseTransform):
 
     @property
     def repr_body(self) -> Dict:
-        return dict(super().repr_body, **{"lambda_fun": self.lambda_fun, "targets": [...]})
+        return dict(
+            super().repr_body, **{"lambda_fun": self.lambda_fun, "targets": [...]}
+        )
+
 
 #####################################################################################################
 #                                       Normalize Class                                             #
@@ -341,6 +355,7 @@ class Normalize(EEGTransform):
             super().repr_body, **{"mean": self.mean, "std": self.std, "axis": self.axis}
         )
 
+
 #####################################################################################################
 #                                       Select Class                                                #
 #####################################################################################################
@@ -348,7 +363,7 @@ class Select(LabelTransform):
     """
     Extracts specified emotion dimension(s)—Valence, Arousal, or Dominance—from a label dictionary.
     """
-    
+
     def __init__(self, key: Union[str, List]):
         super(Select, self).__init__()
         self.key = key
@@ -369,6 +384,7 @@ class Select(LabelTransform):
     def repr_body(self) -> Dict:
         return dict(super().repr_body, **{"key": self.key})
 
+
 #####################################################################################################
 #                                       Binarize Class                                              #
 #####################################################################################################
@@ -376,7 +392,7 @@ class Binarize(LabelTransform):
     """
     Converts continuous emotion scores into high and low classes for a given threshold.
     """
-    
+
     def __init__(self, threshold: float):
         super(Binarize, self).__init__()
         self.threshold = threshold
@@ -388,7 +404,7 @@ class Binarize(LabelTransform):
         if isinstance(y, list):
             return [self.binarize(l) for l in y]
         return self.binarize(y)
-    
+
     def binarize(self, y: Union[int, float]) -> int:
         if np.isnan(y):
             return np.random.randint(2)
@@ -396,7 +412,8 @@ class Binarize(LabelTransform):
 
     @property
     def repr_body(self) -> Dict:
-        return dict(super().repr_body, **{'threshold': self.threshold})
+        return dict(super().repr_body, **{"threshold": self.threshold})
+
 
 #####################################################################################################
 #                                   UnsqueezeDim Class                                              #
@@ -405,7 +422,7 @@ class UnsqueezeDim(EEGTransform):
     """
     Adds a leading dimension to EEG samples, converting [channels, bands] to [1, channels, bands] for batching.
     """
-    
+
     def __call__(
         self, *args, eeg: np.ndarray, baseline: Union[np.ndarray, None] = None, **kwargs
     ) -> Dict[str, np.ndarray]:
@@ -413,6 +430,7 @@ class UnsqueezeDim(EEGTransform):
 
     def apply(self, eeg: np.ndarray, **kwargs) -> np.ndarray:
         return eeg[np.newaxis, ...]
+
 
 #####################################################################################################
 #                                       Tensorize Class                                             #
@@ -433,6 +451,7 @@ class Tensorize(EEGTransform):
     def apply(self, eeg: np.ndarray, **kwargs) -> torch.Tensor:
         return torch.from_numpy(eeg).float()
 
+
 #####################################################################################################
 #                                   DatasetReshape Class                                            #
 #####################################################################################################
@@ -440,6 +459,7 @@ class DatasetReshape(Dataset):
     """
     Reshapes flattened BDE features into [batch, num_electrodes, bands] format for model input.
     """
+
     def __init__(self, X, y, num_electrodes=14):
         self.X = torch.tensor(
             X.reshape(-1, num_electrodes, 4), dtype=torch.float32
@@ -451,6 +471,3 @@ class DatasetReshape(Dataset):
 
     def __getitem__(self, idx):
         return self.X[idx], self.y[idx]
-
-
-
