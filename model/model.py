@@ -15,9 +15,12 @@ class BDEProjectionLayer(nn.Module):
         bde_dim (int): Dimension of BDE features.
         embed_dim (int): Output embedding dimension.
     """
+
+
     def __init__(self, bde_dim, embed_dim):
         super().__init__()
         self.linear = nn.Linear(bde_dim, embed_dim)
+
 
     def forward(self, x):
         """
@@ -43,9 +46,12 @@ class ElectrodeIdentityEmbedding(nn.Module):
         num_electrodes (int): Number of EEG electrodes.
         embed_dim (int): Output embedding dimension.
     """
+
+
     def __init__(self, num_electrodes, embed_dim):
         super().__init__()
         self.embedding = nn.Parameter(torch.randn(1, num_electrodes, embed_dim))
+
 
     def forward(self, x):
         """
@@ -69,10 +75,13 @@ class PreNorm(nn.Module):
         embed_dim (int): Output embedding dimension.
         fn (nn.Module): Model layer to call after normalization.
     """
+
+
     def __init__(self, embed_dim, fn):
         super().__init__()
         self.norm = nn.LayerNorm(embed_dim)
         self.fn = fn
+
 
     def forward(self, x, **kwargs):
         """
@@ -97,6 +106,8 @@ class FeedForward(nn.Module):
         hidden_dim (int): Hidden layer dimension.
         dropout (float): Dropout probability.
     """
+
+
     def __init__(self, embed_dim, hidden_dim, dropout=0.0):
         super().__init__()
         self.net = nn.Sequential(
@@ -106,6 +117,7 @@ class FeedForward(nn.Module):
             nn.Linear(hidden_dim, embed_dim),
             nn.Dropout(dropout),
         )
+
 
     def forward(self, x):
         """
@@ -131,6 +143,8 @@ class InterCorticalMHSA(nn.Module):
         head_dim (int): Embedding dimension per head.
         dropout (float): Dropout probability.
     """
+
+
     def __init__(self, embed_dim, heads=4, head_dim=16, dropout=0.0):
         super().__init__()
         inner_dim = heads * head_dim
@@ -144,6 +158,7 @@ class InterCorticalMHSA(nn.Module):
         )
         self.dropout = nn.Dropout(dropout)
         self.softmax = nn.Softmax(dim=-1)
+
 
     def forward(self, x):
         """
@@ -184,6 +199,8 @@ class InterCorticalAttentionBlock(nn.Module):
         mlp_hidden_dim (int): Hidden layer dimension in the feed-forward network.
         dropout (float): Dropout probability.
     """
+
+
     def __init__(self, embed_dim, heads, head_dim, mlp_hidden_dim, dropout=0.1):
         super().__init__()
         self.attention = PreNorm(
@@ -192,6 +209,7 @@ class InterCorticalAttentionBlock(nn.Module):
         self.feed_forward = PreNorm(
             embed_dim, FeedForward(embed_dim, mlp_hidden_dim, dropout)
         )
+
 
     def forward(self, x):
         """
@@ -218,6 +236,8 @@ class ClassificationHead(nn.Module):
         num_classes (int): Number of affective classes.
         dropout (float): Dropout probability.
     """
+
+
     def __init__(self, embed_dim, num_classes, dropout=0.0):
         super().__init__()
         self.norm = nn.LayerNorm(embed_dim)
@@ -233,6 +253,7 @@ class ClassificationHead(nn.Module):
             nn.Dropout(dropout),
             nn.Linear(embed_dim, num_classes),
         )
+
 
     def forward(self, x):
         """
@@ -266,6 +287,7 @@ class RBTransformer(nn.Module, PyTorchModelHubMixin):
         num_classes (int): Number of output classes.
     """
 
+
     def __init__(
         self,
         num_electrodes=14,
@@ -282,7 +304,9 @@ class RBTransformer(nn.Module, PyTorchModelHubMixin):
 
         # Configure and initialize model layers of RBTransformer
         self.bde_proj_layer = BDEProjectionLayer(bde_dim, embed_dim)
-        self.electrode_id_embedding = ElectrodeIdentityEmbedding(num_electrodes, embed_dim)
+        self.electrode_id_embedding = ElectrodeIdentityEmbedding(
+            num_electrodes, embed_dim
+        )
         self.dropout = nn.Dropout(dropout)
         self.intercortical_attention_blocks = nn.ModuleList(
             [
@@ -306,6 +330,7 @@ class RBTransformer(nn.Module, PyTorchModelHubMixin):
             "dropout": dropout,
             "num_classes": num_classes,
         }
+
 
     def forward(self, x):
         """
@@ -352,16 +377,13 @@ if __name__ == "__main__":
             "arousal": {"binary": 2, "multiclass": 5},
             "dominance": {"binary": 2, "multiclass": 5},
         },
-        "seed": {
-            "num_electrodes": 62,
-            "emotion": {"multiclass": 3}
-        },
+        "seed": {"num_electrodes": 62, "emotion": {"multiclass": 3}},
     }
 
-    dataset_name = "seed"      
-    label_name = "emotion"         
+    dataset_name = "seed"
+    label_name = "emotion"
     task_type = "multiclass"
-    bde_dim = 4                    
+    bde_dim = 4
     batch_size = 16
 
     num_electrodes = dataset_config[dataset_name]["num_electrodes"]
@@ -382,4 +404,6 @@ if __name__ == "__main__":
     )
 
     logits = model(dummy_input)
-    print(f"Dataset: {dataset_name.upper()} | Label: {label_name} | Task: {task_type} | Logits shape: {logits.shape}")
+    print(
+        f"Dataset: {dataset_name.upper()} | Label: {label_name} | Task: {task_type} | Logits shape: {logits.shape}"
+    )
