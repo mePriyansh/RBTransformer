@@ -27,6 +27,7 @@ class BaseDatasetPreprocessing(Dataset):
     def __init__(self, **kwargs):
         self.trial_window_size = kwargs.get("trial_window_size")
         self.baseline_window_size = kwargs.get("baseline_window_size")
+        self.num_channels = kwargs.get("num_channels")
         self.num_baseline = kwargs.get("num_baseline")
         self.stride = kwargs.get("stride")
         self.label_transform = kwargs.get("label_transform")
