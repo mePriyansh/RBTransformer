@@ -38,7 +38,7 @@ class DEAP(BaseDatasetPreprocessing):
 
 
     @staticmethod
-    def read_record(record: str, root_path: str = "./data_preprocessed_python") -> Dict:
+    def read_record(record: str, root_path: str = "./data_preprocessed_python", **kwargs) -> Dict:
         """
         Reads a record from the DEAP dataset and returns the samples and labels.
 
@@ -61,6 +61,7 @@ class DEAP(BaseDatasetPreprocessing):
         record: str,
         samples: np.ndarray,
         labels: np.ndarray,
+        **kwargs
     ):
         """
         Processes EEG samples from a DEAP record and yields fixed-length segments along with corresponding labels.
@@ -104,7 +105,7 @@ class DEAP(BaseDatasetPreprocessing):
             )
 
 
-    def set_records(self, root_path: str = "./data_preprocessed_python"):
+    def set_records(self, root_path: str = "./data_preprocessed_python", **kwargs):
         """
         Returns the list of all records in the DEAP dataset directory.
 

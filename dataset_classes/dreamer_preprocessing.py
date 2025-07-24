@@ -36,7 +36,7 @@ class DREAMER(BaseDatasetPreprocessing):
 
 
     @staticmethod
-    def read_record(record: str, root_path: str = "./DREAMER.mat") -> Dict:
+    def read_record(record: str, root_path: str = "./DREAMER.mat", **kwargs) -> Dict:
         """
         Reads the DREAMER dataset from the .mat file and returns all subjects' EEG samples and labels.
 
@@ -55,6 +55,7 @@ class DREAMER(BaseDatasetPreprocessing):
         self,
         record: str,
         mat_data: Dict,
+        **kwargs
     ):
         """
         Processes EEG samples from a DREAMER record and yields fixed-length segments along with corresponding labels.
@@ -119,7 +120,7 @@ class DREAMER(BaseDatasetPreprocessing):
             )
 
 
-    def set_records(self, root_path: str = "./DREAMER.mat"):
+    def set_records(self, root_path: str = "./DREAMER.mat", **kwargs):
         """
         Returns the list of all records in the DREAMER dataset.
 

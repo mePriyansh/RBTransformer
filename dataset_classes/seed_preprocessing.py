@@ -34,7 +34,7 @@ class SEED(BaseDatasetPreprocessing):
 
 
     @staticmethod
-    def read_record(record: str, root_path: str = "./Preprocessed_EEG") -> Dict:
+    def read_record(record: str, root_path: str = "./Preprocessed_EEG", **kwargs) -> Dict:
         """
         Reads a record from the SEED dataset and returns the samples and labels.
 
@@ -61,6 +61,7 @@ class SEED(BaseDatasetPreprocessing):
         record: str,
         samples: Dict,
         labels: np.ndarray,
+        **kwargs
     ):
         """
         Processes EEG samples from a SEED record and yields fixed-length segments along with corresponding labels.
@@ -100,7 +101,7 @@ class SEED(BaseDatasetPreprocessing):
             )
 
 
-    def set_records(self, root_path: str = "./Preprocessed_EEG"):
+    def set_records(self, root_path: str = "./Preprocessed_EEG", **kwargs):
         """
         Returns the list of all records in the SEED dataset directory.
 
