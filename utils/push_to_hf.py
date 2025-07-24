@@ -1,6 +1,11 @@
-from huggingface_hub import login
 
-def push_model_to_hub(model, repo_id, local_dir="rbtransformer", commit_message="Upload RBTransformer model"):
+
+def push_model_to_hub(
+    model,
+    repo_id,
+    local_dir="rbtransformer",
+    commit_message="Upload RBTransformer model",
+):
     """
     Saves and pushes the model to Hugging Face Hub.
 
