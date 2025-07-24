@@ -24,7 +24,7 @@ class SEED(BaseDatasetPreprocessing):
         super().__init__(
             root_path=root_path,
             num_channels=num_channels,
-            chunk_size=trial_window_size,
+            trial_window_size=trial_window_size,
             stride=stride,
             num_baseline=num_baseline,
             baseline_chunk_size=baseline_window_size,
@@ -32,8 +32,9 @@ class SEED(BaseDatasetPreprocessing):
             num_workers=num_workers,
         )
 
+
     @staticmethod
-    def read_record(record: str, root_path: str = "./Preprocessed_EEG", **kwargs) -> Dict:
+    def read_record(record: str, root_path: str = "./Preprocessed_EEG") -> Dict:
         """
         Reads a record from the SEED dataset and returns the samples and labels.
 
@@ -54,15 +55,12 @@ class SEED(BaseDatasetPreprocessing):
         )["label"][0]
         return {"samples": samples, "labels": labels}
 
+
     def process_record(
         self,
         record: str,
         samples: Dict,
         labels: np.ndarray,
-        trial_window_size: int = 512,
-        stride: int = 117,
-        num_channels: int = 62,
-        **kwargs,
     ):
         """
         Processes EEG samples from a SEED record and yields fixed-length segments along with corresponding labels.
@@ -71,9 +69,6 @@ class SEED(BaseDatasetPreprocessing):
             record (str): Filename of the .mat EEG record (e.g., 1_20131027.mat).
             samples (Dict): Loaded EEG signal data for the subject-session.
             labels (np.ndarray): Emotion labels for each trial.
-            trial_window_size (int): Length of each trial segment.
-            stride (int): Step size between segments.
-            num_channels (int): Number of EEG channels.
 
         Yields:
             dict: For trial segments, returns {'eeg', 'key', 'info'}.
@@ -86,7 +81,7 @@ class SEED(BaseDatasetPreprocessing):
         trial_ids = [key for key in samples.keys() if "eeg" in key]
 
         for trial_id in trial_ids:
-            trial_samples = samples[trial_id][:num_channels]
+            trial_samples = samples[trial_id][: self.num_channels]
 
             trial_meta_info = {
                 "subject_id": subject_id,
@@ -100,14 +95,12 @@ class SEED(BaseDatasetPreprocessing):
                 trial_meta=trial_meta_info,
                 write_ptr=write_pointer,
                 record_prefix=record,
-                stride=stride,
-                window_size=trial_window_size,
                 start_at=0,
                 baseline_sample=None,
             )
 
 
-    def set_records(self, root_path: str = "./Preprocessed_EEG", **kwargs):
+    def set_records(self, root_path: str = "./Preprocessed_EEG"):
         """
         Returns the list of all records in the SEED dataset directory.
 
@@ -123,23 +116,19 @@ class SEED(BaseDatasetPreprocessing):
         return [f for f in file_list if f not in skip_set]
 
 
-
 if __name__ == "__main__":
     #####################################################################################################
     #                                  SEED-MULTI-DATASET-PREPROCESSING                                 #
     #####################################################################################################
-    label_transform = StackTransforms([           
-        Select('emotion'),
-        Lambda(lambda x: x + 1)
-    ])
+    label_transform = StackTransforms([Select("emotion"), Lambda(lambda x: x + 1)])
 
     seed_multi_dataset = SEED(
-        root_path='./Preprocessed_EEG',
+        root_path="./Preprocessed_EEG",
         trial_window_size=512,
         num_channels=14,
         stride=117,
         label_transform=label_transform,
-        num_workers=8
+        num_workers=8,
     )
 
     filename = "preprocessed_datasets/seed_multi_dataset.pkl"

@@ -1,4 +1,3 @@
-import os
 import numpy as np
 from collections import defaultdict
 from tqdm.notebook import tqdm
@@ -15,6 +14,7 @@ from preprocessing.transformations import (
 )
 from typing import Any, Callable, List, Tuple, Dict
 
+
 #####################################################################################################
 #                                      BASE DATASET-PREPROCESSING-CLASS                             #
 #####################################################################################################
@@ -23,16 +23,21 @@ class BaseDatasetPreprocessing(Dataset):
     BaseDatasetPreprocessing class for dataset preprocessing in RBTransformer.
     Subclassed by SEED, DEAP, and DREAMER.
     """
+
     def __init__(self, **kwargs):
-        self.num_baseline = kwargs.get("num_baseline")
+        self.trial_window_size = kwargs.get("trial_window_size")
         self.baseline_window_size = kwargs.get("baseline_window_size")
-        self.tensorize = Tensorize()
+        self.num_baseline = kwargs.get("num_baseline")
+        self.stride = kwargs.get("stride")
         self.label_transform = kwargs.get("label_transform")
         self.num_workers = kwargs.get("num_workers")
+        self.tensorize = Tensorize()
         self._eeg_memory: Dict[str, Dict[str, Any]] = defaultdict(dict)
         self._info_memory: List[Dict] = []
         self.dataset_name = self.__class__.__name__.replace("Dataset", "")
-        self.apply_to_baseline = self.num_baseline is not None and self.baseline_window_size is not None
+        self.apply_to_baseline = (
+            self.num_baseline is not None and self.baseline_window_size is not None
+        )
         self.preprocessing_transformations = StackTransforms(
             [
                 Normalize(apply_to_baseline=self.apply_to_baseline),
@@ -68,7 +73,9 @@ class BaseDatasetPreprocessing(Dataset):
             pbar.close()
         else:
             # Parallel preprocessing of records
-            with tqdm_joblib(total=len(records), desc=f"Preprocessing {self.dataset_name} Dataset") as _:
+            with tqdm_joblib(
+                total=len(records), desc=f"Preprocessing {self.dataset_name} Dataset"
+            ) as _:
                 results = Parallel(n_jobs=self.num_workers)(
                     delayed(self.handle_record)(
                         record=record,
@@ -133,8 +140,6 @@ class BaseDatasetPreprocessing(Dataset):
         trial_meta: dict,
         write_ptr: int,
         record_prefix: str,
-        stride: int,
-        window_size: int,
         start_at: int = 0,
         baseline_sample: np.ndarray | None = None,
     ):
@@ -146,8 +151,6 @@ class BaseDatasetPreprocessing(Dataset):
             trial_meta (dict): Metadata for the trial.
             write_ptr (int): Global index for segment IDs.
             record_prefix (str): Prefix for segment keys.
-            stride (int): Step size between segments.
-            window_size (int): Length of each segment.
             start_at (int): Start index for segmenting.
             baseline_sample (np.ndarray | None): Optional baseline segment.
 
@@ -155,6 +158,8 @@ class BaseDatasetPreprocessing(Dataset):
             dict: For trial segments, returns {'eeg', 'key', 'info'}.
                 For the baseline segment, returns {'eeg', 'key'}.
         """
+
+        window_size = self.trial_window_size
 
         if window_size <= 0:
             window_size = trial_samples.shape[1] - start_at
@@ -166,7 +171,9 @@ class BaseDatasetPreprocessing(Dataset):
             clip = trial_samples[:, start_at:end_at]
 
             if baseline_sample is not None:
-                transformed = self.preprocessing_transformations(eeg=clip, baseline=baseline_sample)
+                transformed = self.preprocessing_transformations(
+                    eeg=clip, baseline=baseline_sample
+                )
                 t_eeg = transformed["eeg"]
                 t_baseline = transformed["baseline"]
             else:
@@ -185,7 +192,7 @@ class BaseDatasetPreprocessing(Dataset):
             yield {"eeg": t_eeg, "key": clip_id, "info": info}
             write_ptr += 1
 
-            start_at += stride
+            start_at += self.stride
             end_at = start_at + window_size
 
         return write_ptr

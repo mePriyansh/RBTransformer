@@ -5,6 +5,7 @@ from dataset_classes.base_preprocessing import BaseDatasetPreprocessing
 from typing import Callable, Dict, Union
 from preprocessing.transformations import StackTransforms, Lambda, Select, Binarize
 
+
 #####################################################################################################
 #                                      DEAP-PREPROCESSING-CLASS                                     #
 #####################################################################################################
@@ -12,6 +13,7 @@ class DEAP(BaseDatasetPreprocessing):
     """
     Preprocessing Dataset class for DEAP dataset for RBTransformer.
     """
+
     def __init__(
         self,
         root_path: str = "./data_preprocessed_python",
@@ -27,7 +29,7 @@ class DEAP(BaseDatasetPreprocessing):
             root_path=root_path,
             num_channels=num_channels,
             num_baseline=num_baseline,
-            chunk_size=trial_window_size,
+            trial_window_size=trial_window_size,
             baseline_window_size=baseline_window_size,
             stride=stride,
             label_transform=label_transform,
@@ -36,9 +38,7 @@ class DEAP(BaseDatasetPreprocessing):
 
 
     @staticmethod
-    def read_record(
-        record: str, root_path: str = "./data_preprocessed_python", **kwargs
-    ) -> Dict:
+    def read_record(record: str, root_path: str = "./data_preprocessed_python") -> Dict:
         """
         Reads a record from the DEAP dataset and returns the samples and labels.
 
@@ -61,12 +61,6 @@ class DEAP(BaseDatasetPreprocessing):
         record: str,
         samples: np.ndarray,
         labels: np.ndarray,
-        trial_window_size: int = 512,
-        stride: int = 117,
-        num_channels: int = 32,
-        num_baseline: int = 3,
-        baseline_window_size: int = 128,
-        **kwargs,
     ):
         """
         Processes EEG samples from a DEAP record and yields fixed-length segments along with corresponding labels.
@@ -75,11 +69,6 @@ class DEAP(BaseDatasetPreprocessing):
             record (str): Record identifier.
             samples (np.ndarray): Raw EEG data.
             labels (np.ndarray): Valence, arousal, dominance, and liking scores.
-            trial_window_size (int): Length of each trial segment.
-            stride (int): Step size between segments.
-            num_channels (int): Number of EEG channels.
-            num_baseline (int): Number of baseline segments.
-            baseline_window_size (int): Length of each baseline segment.
 
         Yields:
             dict: For trial segments, returns {'eeg', 'key', 'info'}.
@@ -89,13 +78,13 @@ class DEAP(BaseDatasetPreprocessing):
         write_pointer = 0
 
         for trial_id in range(len(samples)):
-            trial_samples = samples[trial_id, :num_channels]
+            trial_samples = samples[trial_id, : self.num_channels]
 
             trial_baseline_sample = trial_samples[
-                :, : baseline_window_size * num_baseline
+                :, : self.baseline_window_size * self.num_baseline
             ]
             trial_baseline_sample = trial_baseline_sample.reshape(
-                num_channels, num_baseline, baseline_window_size
+                self.num_channels, self.num_baseline, self.baseline_window_size
             ).mean(axis=1)
 
             trial_meta_info = {"subject_id": subject_id, "trial_id": trial_id}
@@ -103,21 +92,19 @@ class DEAP(BaseDatasetPreprocessing):
             for idx, name in enumerate(["valence", "arousal", "dominance", "liking"]):
                 trial_meta_info[name] = trial_rating[idx]
 
-            start_at = baseline_window_size * num_baseline
+            start_at = self.baseline_window_size * self.num_baseline
 
             write_pointer = yield from self._yield_windows(
                 trial_samples=trial_samples,
                 trial_meta=trial_meta_info,
                 write_ptr=write_pointer,
                 record_prefix=record,
-                stride=stride,
-                window_size=trial_window_size,
                 start_at=start_at,
                 baseline_sample=trial_baseline_sample,
             )
 
 
-    def set_records(self, root_path: str = "./data_preprocessed_python", **kwargs):
+    def set_records(self, root_path: str = "./data_preprocessed_python"):
         """
         Returns the list of all records in the DEAP dataset directory.
 
@@ -134,11 +121,13 @@ class DEAP(BaseDatasetPreprocessing):
 if __name__ == "__main__":
     #####################################################################################################
     #                             DEAP-BINARY-VALENCE-DATASET-PREPROCESSING                             #
-    #####################################################################################################  
-    label_transform = StackTransforms([
-        Select('valence'),            
-        Binarize(5.0), 
-    ])
+    #####################################################################################################
+    label_transform = StackTransforms(
+        [
+            Select("valence"),
+            Binarize(5.0),
+        ]
+    )
 
     deap_binary_valence_dataset = DEAP(
         root_path="./data_preprocessed_python",
@@ -148,7 +137,7 @@ if __name__ == "__main__":
         num_baseline=3,
         stride=117,
         label_transform=label_transform,
-        num_workers=8
+        num_workers=8,
     )
 
     filename = "preprocessed_datasets/deap_binary_valence_dataset.pkl"
@@ -158,10 +147,12 @@ if __name__ == "__main__":
     #####################################################################################################
     #                             DEAP-BINARY-AROUSAL-DATASET-PREPROCESSING                             #
     #####################################################################################################
-    label_transform = StackTransforms([
-        Select('arousal'),            
-        Binarize(5.0), 
-    ])
+    label_transform = StackTransforms(
+        [
+            Select("arousal"),
+            Binarize(5.0),
+        ]
+    )
 
     deap_binary_arousal_dataset = DEAP(
         root_path="./data_preprocessed_python",
@@ -171,7 +162,7 @@ if __name__ == "__main__":
         num_baseline=3,
         stride=117,
         label_transform=label_transform,
-        num_workers=8
+        num_workers=8,
     )
 
     filename = "preprocessed_datasets/deap_binary_arousal_dataset.pkl"
@@ -181,10 +172,12 @@ if __name__ == "__main__":
     #####################################################################################################
     #                            DEAP-BINARY-DOMINANCE-DATASET-PREPROCESSING                            #
     #####################################################################################################
-    label_transform = StackTransforms([
-        Select('dominance'),            
-        Binarize(5.0),
-    ])
+    label_transform = StackTransforms(
+        [
+            Select("dominance"),
+            Binarize(5.0),
+        ]
+    )
 
     deap_binary_dominance_dataset = DEAP(
         root_path="./data_preprocessed_python",
@@ -194,7 +187,7 @@ if __name__ == "__main__":
         num_baseline=3,
         stride=117,
         label_transform=label_transform,
-        num_workers=8
+        num_workers=8,
     )
 
     filename = "preprocessed_datasets/deap_binary_dominance_dataset.pkl"
@@ -202,12 +195,9 @@ if __name__ == "__main__":
         pickle.dump(deap_binary_dominance_dataset, f)
 
     #####################################################################################################
-    #                              DEAP-MULTI-VALENCE-DATASET-PREPROCESSING                             #  
+    #                              DEAP-MULTI-VALENCE-DATASET-PREPROCESSING                             #
     #####################################################################################################
-    label_transform = StackTransforms([
-        Select('valence'),            
-        Lambda(lambda x: int(x) - 1)  
-    ])
+    label_transform = StackTransforms([Select("valence"), Lambda(lambda x: int(x) - 1)])
 
     deap_multi_valence_dataset = DEAP(
         root_path="./data_preprocessed_python",
@@ -217,7 +207,7 @@ if __name__ == "__main__":
         num_baseline=3,
         stride=117,
         label_transform=label_transform,
-        num_workers=8
+        num_workers=8,
     )
 
     filename = "preprocessed_datasets/deap_multi_valence_dataset.pkl"
@@ -227,10 +217,7 @@ if __name__ == "__main__":
     #####################################################################################################
     #                             DEAP-MULTI-AROUSAL-DATASET-PREPROCESSING                              #
     #####################################################################################################
-    label_transform = StackTransforms([
-        Select('arousal'),            
-        Lambda(lambda x: int(x) - 1)  
-    ])
+    label_transform = StackTransforms([Select("arousal"), Lambda(lambda x: int(x) - 1)])
 
     deap_multi_arousal_dataset = DEAP(
         root_path="./data_preprocessed_python",
@@ -240,7 +227,7 @@ if __name__ == "__main__":
         num_baseline=3,
         stride=117,
         label_transform=label_transform,
-        num_workers=8
+        num_workers=8,
     )
 
     filename = "preprocessed_datasets/deap_multi_arousal_dataset.pkl"
@@ -250,10 +237,9 @@ if __name__ == "__main__":
     #####################################################################################################
     #                            DEAP-MULTI-DOMINANCE-DATASET-PREPROCESSING                             #
     #####################################################################################################
-    label_transform = StackTransforms([
-        Select('dominance'),            
-        Lambda(lambda x: int(x) - 1)  
-    ])
+    label_transform = StackTransforms(
+        [Select("dominance"), Lambda(lambda x: int(x) - 1)]
+    )
 
     deap_multi_dominance_dataset = DEAP(
         root_path="./data_preprocessed_python",
@@ -263,7 +249,7 @@ if __name__ == "__main__":
         num_baseline=3,
         stride=117,
         label_transform=label_transform,
-        num_workers=8
+        num_workers=8,
     )
 
     filename = "preprocessed_datasets/deap_multi_dominance_dataset.pkl"

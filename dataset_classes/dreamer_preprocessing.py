@@ -5,6 +5,7 @@ from dataset_classes.base_preprocessing import BaseDatasetPreprocessing
 from typing import Callable, Dict, Union
 from preprocessing.transformations import StackTransforms, Lambda, Select, Binarize
 
+
 #####################################################################################################
 #                                    DREAMER-PREPROCESSING-CLASS                                    #
 #####################################################################################################
@@ -27,7 +28,7 @@ class DREAMER(BaseDatasetPreprocessing):
             num_channels=num_channels,
             num_baseline=num_baseline,
             stride=stride,
-            chunk_size=trial_window_size,
+            trial_window_size=trial_window_size,
             baseline_chunk_size=baseline_window_size,
             label_transform=label_transform,
             num_workers=num_workers,
@@ -35,7 +36,7 @@ class DREAMER(BaseDatasetPreprocessing):
 
 
     @staticmethod
-    def read_record(record: str, root_path: str = "./DREAMER.mat", **kwargs) -> Dict:
+    def read_record(record: str, root_path: str = "./DREAMER.mat") -> Dict:
         """
         Reads the DREAMER dataset from the .mat file and returns all subjects' EEG samples and labels.
 
@@ -49,16 +50,11 @@ class DREAMER(BaseDatasetPreprocessing):
         mat_data = scio.loadmat(root_path, verify_compressed_data_integrity=False)
         return {"mat_data": mat_data}
 
+
     def process_record(
         self,
         record: str,
         mat_data: Dict,
-        trial_window_size: int = 512,
-        num_channels: int = 14,
-        num_baseline: int = 61,
-        stride: int = 117,
-        baseline_window_size: int = 128,
-        **kwargs,
     ):
         """
         Processes EEG samples from a DREAMER record and yields fixed-length segments along with corresponding labels.
@@ -66,15 +62,10 @@ class DREAMER(BaseDatasetPreprocessing):
         Args:
             record (str): Record identifier (subject index).
             mat_data (Dict): Parsed .mat content from the DREAMER dataset.
-            trial_window_size (int): Length of each trial segment.
-            num_channels (int): Number of EEG channels.
-            num_baseline (int): Number of baseline segments.
-            stride (int): Step size between segments.
-            baseline_window_size (int): Length of each baseline segment.
 
         Yields:
             dict: For trial segments, returns {'eeg', 'key', 'info'}.
-                  For the baseline segment, returns {'eeg', 'key'}.
+                For the baseline segment, returns {'eeg', 'key'}.
         """
         subject = record
         trial_len = len(
@@ -86,12 +77,16 @@ class DREAMER(BaseDatasetPreprocessing):
             trial_baseline_sample = mat_data["DREAMER"][0, 0]["Data"][0, subject][
                 "EEG"
             ][0, 0]["baseline"][0, 0][trial_id, 0]
-            trial_baseline_sample = trial_baseline_sample[:, :num_channels].swapaxes(
-                1, 0
-            )
+            trial_baseline_sample = trial_baseline_sample[
+                :, : self.num_channels
+            ].swapaxes(1, 0)
             trial_baseline_sample = (
-                trial_baseline_sample[:, : num_baseline * baseline_window_size]
-                .reshape(num_channels, num_baseline, baseline_window_size)
+                trial_baseline_sample[
+                    :, : self.num_baseline * self.baseline_window_size
+                ]
+                .reshape(
+                    self.num_channels, self.num_baseline, self.baseline_window_size
+                )
                 .mean(axis=1)
             )
 
@@ -112,20 +107,19 @@ class DREAMER(BaseDatasetPreprocessing):
             trial_samples = mat_data["DREAMER"][0, 0]["Data"][0, subject]["EEG"][0, 0][
                 "stimuli"
             ][0, 0][trial_id, 0]
-            trial_samples = trial_samples[:, :num_channels].swapaxes(1, 0)
+            trial_samples = trial_samples[:, : self.num_channels].swapaxes(1, 0)
 
             write_pointer = yield from self._yield_windows(
                 trial_samples=trial_samples,
                 trial_meta=trial_meta_info,
                 write_ptr=write_pointer,
                 record_prefix=str(subject),
-                stride=stride,
-                window_size=trial_window_size,
                 start_at=0,
                 baseline_sample=trial_baseline_sample,
             )
 
-    def set_records(self, root_path: str = "./DREAMER.mat", **kwargs):
+
+    def set_records(self, root_path: str = "./DREAMER.mat"):
         """
         Returns the list of all records in the DREAMER dataset.
 
@@ -140,24 +134,27 @@ class DREAMER(BaseDatasetPreprocessing):
         subject_len = len(mat_data["DREAMER"][0, 0]["Data"][0])
         return list(range(subject_len))
 
+
 if __name__ == "__main__":
     #####################################################################################################
     #                            DREAMER-BINARY-VALENCE-DATASET-PREPROCESSING                           #
-    #####################################################################################################  
-    label_transform = StackTransforms([
-        Select('valence'),            
-        Binarize(3.0), 
-    ])
+    #####################################################################################################
+    label_transform = StackTransforms(
+        [
+            Select("valence"),
+            Binarize(3.0),
+        ]
+    )
 
     dreamer_binary_valence_dataset = DREAMER(
-        root_path='./DREAMER.mat',
+        root_path="./DREAMER.mat",
         trial_window_size=512,
         baseline_window_size=128,
         num_channels=14,
         num_baseline=61,
         stride=117,
         label_transform=label_transform,
-        num_workers=8
+        num_workers=8,
     )
 
     filename = "preprocessed_datasets/dreamer_binary_valence_dataset.pkl"
@@ -167,20 +164,22 @@ if __name__ == "__main__":
     #####################################################################################################
     #                           DREAMER-BINARY-AROUSAL-DATASET-PREPROCESSING                            #
     #####################################################################################################
-    label_transform = StackTransforms([
-        Select('arousal'),            
-        Binarize(3.0), 
-    ])
+    label_transform = StackTransforms(
+        [
+            Select("arousal"),
+            Binarize(3.0),
+        ]
+    )
 
     dreamer_binary_arousal_dataset = DREAMER(
-        root_path='./DREAMER.mat',
+        root_path="./DREAMER.mat",
         trial_window_size=512,
         baseline_window_size=128,
         num_channels=14,
         num_baseline=61,
         stride=117,
         label_transform=label_transform,
-        num_workers=8
+        num_workers=8,
     )
 
     filename = "preprocessed_datasets/dreamer_binary_arousal_dataset.pkl"
@@ -190,43 +189,42 @@ if __name__ == "__main__":
     #####################################################################################################
     #                           DREAMER-BINARY-DOMINANCE-DATASET-PREPROCESSING                          #
     #####################################################################################################
-    label_transform = StackTransforms([
-        Select('dominance'),            
-        Binarize(3.0),
-    ])
+    label_transform = StackTransforms(
+        [
+            Select("dominance"),
+            Binarize(3.0),
+        ]
+    )
 
     dreamer_binary_dominance_dataset = DREAMER(
-        root_path='./DREAMER.mat',
+        root_path="./DREAMER.mat",
         trial_window_size=512,
         baseline_window_size=128,
         num_channels=14,
         num_baseline=61,
         stride=117,
         label_transform=label_transform,
-        num_workers=8
+        num_workers=8,
     )
 
     filename = "preprocessed_datasets/dreamer_binary_dominance_dataset.pkl"
     with open(filename, "wb") as f:
         pickle.dump(dreamer_binary_dominance_dataset, f)
-        
+
     #####################################################################################################
     #                            DREAMER-MULTI-VALENCE-DATASET-PREPROCESSING                            #
     #####################################################################################################
-    label_transform = StackTransforms([
-        Select('valence'),            
-        Lambda(lambda x: int(x) - 1)  
-    ])
+    label_transform = StackTransforms([Select("valence"), Lambda(lambda x: int(x) - 1)])
 
     dreamer_multi_valence_dataset = DREAMER(
-        root_path='./DREAMER.mat',
+        root_path="./DREAMER.mat",
         trial_window_size=512,
         baseline_window_size=128,
         num_channels=14,
         num_baseline=61,
         stride=117,
         label_transform=label_transform,
-        num_workers=8
+        num_workers=8,
     )
 
     filename = "preprocessed_datasets/dreamer_multi_valence_dataset.pkl"
@@ -236,20 +234,17 @@ if __name__ == "__main__":
     #####################################################################################################
     #                            DREAMER-MULTI-AROUSAL-DATASET-PREPROCESSING                            #
     #####################################################################################################
-    label_transform = StackTransforms([
-        Select('arousal'),            
-        Lambda(lambda x: int(x) - 1)  
-    ])
+    label_transform = StackTransforms([Select("arousal"), Lambda(lambda x: int(x) - 1)])
 
     dreamer_multi_arousal_dataset = DREAMER(
-        root_path='./DREAMER.mat',
+        root_path="./DREAMER.mat",
         trial_window_size=512,
         baseline_window_size=128,
         num_channels=14,
         num_baseline=61,
         stride=117,
         label_transform=label_transform,
-        num_workers=8
+        num_workers=8,
     )
 
     filename = "preprocessed_datasets/dreamer_multi_arousal_dataset.pkl"
@@ -259,20 +254,19 @@ if __name__ == "__main__":
     #####################################################################################################
     #                           DREAMER-MULTI-DOMINANCE-DATASET-PREPROCESSING                           #
     #####################################################################################################
-    label_transform = StackTransforms([
-        Select('dominance'),            
-        Lambda(lambda x: int(x) - 1)  
-    ])
+    label_transform = StackTransforms(
+        [Select("dominance"), Lambda(lambda x: int(x) - 1)]
+    )
 
     dreamer_multi_dominance_dataset = DREAMER(
-        root_path='./DREAMER.mat',
+        root_path="./DREAMER.mat",
         trial_window_size=512,
         baseline_window_size=128,
         num_channels=14,
         num_baseline=61,
         stride=117,
         label_transform=label_transform,
-        num_workers=8
+        num_workers=8,
     )
 
     filename = "preprocessed_datasets/dreamer_multi_dominance_dataset.pkl"
