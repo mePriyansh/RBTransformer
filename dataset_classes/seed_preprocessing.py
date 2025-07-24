@@ -130,7 +130,7 @@ if __name__ == "__main__":
     seed_multi_dataset = SEED(
         root_path="./Preprocessed_EEG",
         trial_window_size=512,
-        num_channels=14,
+        num_channels=62,
         stride=117,
         label_transform=label_transform,
         num_workers=8,
