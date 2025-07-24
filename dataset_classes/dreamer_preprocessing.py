@@ -29,7 +29,7 @@ class DREAMER(BaseDatasetPreprocessing):
             num_baseline=num_baseline,
             stride=stride,
             trial_window_size=trial_window_size,
-            baseline_chunk_size=baseline_window_size,
+            baseline_window_size=baseline_window_size,
             label_transform=label_transform,
             num_workers=num_workers,
         )
