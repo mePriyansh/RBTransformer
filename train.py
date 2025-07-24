@@ -52,9 +52,7 @@ PREPROCESSED_DATASETS = {
         },
     },
     "seed": {
-        "emotion": {
-            "multiclass": "preprocessed_datasets/seed_multi_dataset.pkl"
-        },
+        "emotion": {"multiclass": "preprocessed_datasets/seed_multi_dataset.pkl"},
     },
 }
 
@@ -71,14 +69,14 @@ print(f"Loaded dataset from {dataset_path}")
 
 
 ################################################################################
-# SEED CONFIG 
+# SEED CONFIG
 ################################################################################
 SEED = 23
 set_seed(SEED)
 
 
 ################################################################################
-# TRAINING-PARAMETERS 
+# TRAINING-PARAMETERS
 ################################################################################
 num_epochs = 300
 kfolds = 5
@@ -93,7 +91,7 @@ data_drop_ratio = 0.10
 
 
 ################################################################################
-# MODEL-CONFIG 
+# MODEL-CONFIG
 ################################################################################
 num_electrodes = 14
 bde_dim = 4
@@ -104,14 +102,14 @@ head_dim = 32
 mlp_hidden_dim = 128
 dropout = 0.1
 num_classes = 2  # For DEAP and Dreamer Binary-Class Classification Training: 2
-                 # For SEED Multi-Class Classification Training: 3
-                 # For Dreamer Multi-Class Classification Training: 5
-                 # For Deap Multi-Class Classification Training: 9
+# For SEED Multi-Class Classification Training: 3
+# For Dreamer Multi-Class Classification Training: 5
+# For Deap Multi-Class Classification Training: 9
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 ################################################################################
-#  WANDB & HUGGINGFACE CONFIG 
+#  WANDB & HUGGINGFACE CONFIG
 ################################################################################
 load_dotenv()
 
@@ -161,12 +159,11 @@ y_full = y_full[kept_indices]
 
 
 ################################################################################
-# K-FOLD TRAINING  
+# K-FOLD TRAINING
 ################################################################################
 kf = KFold(n_splits=kfolds, shuffle=True, random_state=SEED)
 
 for fold, (train_idx, val_idx) in enumerate(kf.split(range(len(y_full)))):
-
     print(f"\nFold {fold + 1}/{kfolds}")
 
     X_train = X_full[train_idx]
@@ -218,18 +215,18 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(range(len(y_full)))):
 
     wandb.init(
         project=wandb_run_name,
-        group='dreamer-binary-valence',
-        name=f'Kfold-Run-{fold+1}',
+        group="dreamer-binary-valence",
+        name=f"Kfold-Run-{fold + 1}",
         config={
-            'learning_rate': initial_learning_rate,
-            'min_learning_rate': minimum_learning_rate,
-            'num_epochs': num_epochs,
-            'model': 'RBTransformer',
-            'num_folds': kfolds,
-            'fold': fold+1,
-            'optimizer': 'AdamW',
-            'scheduler': 'CosineAnnealingLR',
-        }
+            "learning_rate": initial_learning_rate,
+            "min_learning_rate": minimum_learning_rate,
+            "num_epochs": num_epochs,
+            "model": "RBTransformer",
+            "num_folds": kfolds,
+            "fold": fold + 1,
+            "optimizer": "AdamW",
+            "scheduler": "CosineAnnealingLR",
+        },
     )
 
     for epoch in range(num_epochs):
@@ -263,7 +260,7 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(range(len(y_full)))):
             _, predicted = torch.max(outputs, 1)
             train_total += y.size(0)
             train_correct += (predicted == y).sum().item()
-        
+
         scheduler.step()
 
         train_accuracy = train_correct / train_total
@@ -289,24 +286,28 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(range(len(y_full)))):
         avg_val_loss = val_loss / len(val_loader)
 
         val_accuracy = accuracy_score(all_targets, all_preds)
-        precision = precision_score(all_targets, all_preds, average="macro", zero_division=0)
+        precision = precision_score(
+            all_targets, all_preds, average="macro", zero_division=0
+        )
         recall = recall_score(all_targets, all_preds, average="macro", zero_division=0)
         f1 = f1_score(all_targets, all_preds, average="macro", zero_division=0)
 
-        wandb.log({
-            'epoch': epoch + 1,
-            'train_loss': avg_train_loss,
-            'train_accuracy': train_accuracy,
-            'val_loss': avg_val_loss,
-            'val_accuracy': val_accuracy,
-            'precision': precision,
-            'recall': recall,
-            'f1_score': f1,
-            'lr': optimizer.param_groups[0]['lr'],
-            'train_batch_size': current_batch_size
-        })
+        wandb.log(
+            {
+                "epoch": epoch + 1,
+                "train_loss": avg_train_loss,
+                "train_accuracy": train_accuracy,
+                "val_loss": avg_val_loss,
+                "val_accuracy": val_accuracy,
+                "precision": precision,
+                "recall": recall,
+                "f1_score": f1,
+                "lr": optimizer.param_groups[0]["lr"],
+                "train_batch_size": current_batch_size,
+            }
+        )
 
-        tqdm.write(f"\n[Fold {fold+1}] Epoch {epoch+1}/{num_epochs}")
+        tqdm.write(f"\n[Fold {fold + 1}] Epoch {epoch + 1}/{num_epochs}")
         tqdm.write(f"Train Loss     : {avg_train_loss:.4f}")
         tqdm.write(f"Train Accuracy : {train_accuracy:.4f}")
         tqdm.write(f"Val Loss       : {avg_val_loss:.4f}")
@@ -316,12 +317,11 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(range(len(y_full)))):
         tqdm.write(f"F1 Score       : {f1:.4f}")
         tqdm.write(f"Learning Rate  : {optimizer.param_groups[0]['lr']:.6f}")
         tqdm.write(f"Batch Size     : {current_batch_size}")
-        
+
     push_model_to_hub(
         model=model,
-        repo_id=f"{base_repo_id}-{fold+1}",
-        commit_message=f"Upload of trained RBTransformer on Kfold-{fold+1} run"
+        repo_id=f"{base_repo_id}-{fold + 1}",
+        commit_message=f"Upload of trained RBTransformer on Kfold-{fold + 1} run",
     )
-    
-    wandb.finish()
 
+    wandb.finish()
