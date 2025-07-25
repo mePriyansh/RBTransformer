@@ -17,6 +17,7 @@ from preprocessing.transformations import (
     Lambda,
 )
 
+
 def patch_pickle_loading():
     dataset_main = types.ModuleType("__main__")
 

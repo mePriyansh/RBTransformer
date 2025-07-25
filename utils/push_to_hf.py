@@ -1,5 +1,3 @@
-
-
 def push_model_to_hub(
     model,
     repo_id,
