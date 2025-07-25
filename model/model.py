@@ -16,11 +16,9 @@ class BDEProjectionLayer(nn.Module):
         embed_dim (int): Output embedding dimension.
     """
 
-
     def __init__(self, bde_dim, embed_dim):
         super().__init__()
         self.linear = nn.Linear(bde_dim, embed_dim)
-
 
     def forward(self, x):
         """
@@ -47,11 +45,9 @@ class ElectrodeIdentityEmbedding(nn.Module):
         embed_dim (int): Output embedding dimension.
     """
 
-
     def __init__(self, num_electrodes, embed_dim):
         super().__init__()
         self.embedding = nn.Parameter(torch.randn(1, num_electrodes, embed_dim))
-
 
     def forward(self, x):
         """
@@ -76,12 +72,10 @@ class PreNorm(nn.Module):
         fn (nn.Module): Model layer to call after normalization.
     """
 
-
     def __init__(self, embed_dim, fn):
         super().__init__()
         self.norm = nn.LayerNorm(embed_dim)
         self.fn = fn
-
 
     def forward(self, x, **kwargs):
         """
@@ -107,7 +101,6 @@ class FeedForward(nn.Module):
         dropout (float): Dropout probability.
     """
 
-
     def __init__(self, embed_dim, hidden_dim, dropout=0.0):
         super().__init__()
         self.net = nn.Sequential(
@@ -117,7 +110,6 @@ class FeedForward(nn.Module):
             nn.Linear(hidden_dim, embed_dim),
             nn.Dropout(dropout),
         )
-
 
     def forward(self, x):
         """
@@ -144,7 +136,6 @@ class InterCorticalMHSA(nn.Module):
         dropout (float): Dropout probability.
     """
 
-
     def __init__(self, embed_dim, heads=4, head_dim=16, dropout=0.0):
         super().__init__()
         inner_dim = heads * head_dim
@@ -158,7 +149,6 @@ class InterCorticalMHSA(nn.Module):
         )
         self.dropout = nn.Dropout(dropout)
         self.softmax = nn.Softmax(dim=-1)
-
 
     def forward(self, x):
         """
@@ -200,7 +190,6 @@ class InterCorticalAttentionBlock(nn.Module):
         dropout (float): Dropout probability.
     """
 
-
     def __init__(self, embed_dim, heads, head_dim, mlp_hidden_dim, dropout=0.1):
         super().__init__()
         self.attention = PreNorm(
@@ -209,7 +198,6 @@ class InterCorticalAttentionBlock(nn.Module):
         self.feed_forward = PreNorm(
             embed_dim, FeedForward(embed_dim, mlp_hidden_dim, dropout)
         )
-
 
     def forward(self, x):
         """
@@ -237,7 +225,6 @@ class ClassificationHead(nn.Module):
         dropout (float): Dropout probability.
     """
 
-
     def __init__(self, embed_dim, num_classes, dropout=0.0):
         super().__init__()
         self.norm = nn.LayerNorm(embed_dim)
@@ -253,7 +240,6 @@ class ClassificationHead(nn.Module):
             nn.Dropout(dropout),
             nn.Linear(embed_dim, num_classes),
         )
-
 
     def forward(self, x):
         """
@@ -286,7 +272,6 @@ class RBTransformer(nn.Module, PyTorchModelHubMixin):
         dropout (float): Dropout probability.
         num_classes (int): Number of output classes.
     """
-
 
     def __init__(
         self,
@@ -330,7 +315,6 @@ class RBTransformer(nn.Module, PyTorchModelHubMixin):
             "dropout": dropout,
             "num_classes": num_classes,
         }
-
 
     def forward(self, x):
         """
