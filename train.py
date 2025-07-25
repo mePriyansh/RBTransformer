@@ -6,8 +6,7 @@ import argparse
 import numpy as np
 import torch.nn as nn
 from tqdm import tqdm
-from dotenv import load_dotenv
-from collections import Counter
+# from collections import Counter
 from utils.seed import set_seed
 from huggingface_hub import login
 from model.model import RBTransformer
@@ -16,6 +15,7 @@ from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import KFold
 from utils.push_to_hf import push_model_to_hub
 import torch.optim.lr_scheduler as lr_scheduler
+from utils.messages import success, fail
 from utils.pickle_patch import patch_pickle_loading
 from preprocessing.transformations import DatasetReshape
 from utils.auto_detect import get_num_electrodes, get_num_classes
@@ -25,14 +25,21 @@ from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_sc
 # ARGPARSE CONFIGURATION
 ################################################################################
 
+
 def parse_args():
     parser = argparse.ArgumentParser(description="RBTransformer EEG Training Script")
     parser.add_argument("--root_dir", type=str, default="preprocessed_datasets")
-    parser.add_argument("--dataset_name", type=str, required=True, choices=["seed", "deap", "dreamer"])
-    parser.add_argument("--task_type", type=str, required=True, choices=["binary", "multi"])
+    parser.add_argument(
+        "--dataset_name", type=str, required=True, choices=["seed", "deap", "dreamer"]
+    )
+    parser.add_argument(
+        "--task_type", type=str, required=True, choices=["binary", "multi"]
+    )
     parser.add_argument("--dimension", type=str, required=True)
     parser.add_argument("--seed", type=int, default=23)
-    parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu"
+    )
     parser.add_argument("--num_workers", type=int, default=8)
     parser.add_argument("--hf_username", type=str, required=True)
     parser.add_argument("--hf_token", type=str, required=True)
@@ -41,10 +48,9 @@ def parse_args():
 
 
 ################################################################################
-# MAIN-FUNCTION  
+# MAIN-FUNCTION
 ################################################################################
 def main():
-    
     args = parse_args()
 
     ################################################################################
@@ -82,27 +88,42 @@ def main():
         },
     }
 
-
     # Select Preprocessed Dataset
     DATASET_NAME = args.dataset_name  # Options: "seed", "deap", "dreamer"
-    CLASSIFICATION_TYPE = args.task_type  # Options: "multi" For SEED; "binary", "multi" For DEAP/DREAMER
-    DIMENSION = args.dimension  # Options: "emotion" For SEED, "valence", "arousal", "dominance" For DEAP/DREAMER
-    dataset_path = os.path.join(args.root_dir, PREPROCESSED_DATASETS[DATASET_NAME][CLASSIFICATION_TYPE][DIMENSION])
+    CLASSIFICATION_TYPE = (
+        args.task_type
+    )  # Options: "multi" For SEED; "binary", "multi" For DEAP/DREAMER
+    DIMENSION = (
+        args.dimension
+    )  # Options: "emotion" For SEED, "valence", "arousal", "dominance" For DEAP/DREAMER
+    dataset_path = os.path.join(
+        args.root_dir,
+        PREPROCESSED_DATASETS[DATASET_NAME][CLASSIFICATION_TYPE][DIMENSION],
+    )
 
+    print(
+        success(
+            f"Training Initialized => Dataset: {DATASET_NAME.upper()} || Dimension: {DIMENSION.capitalize()} || Task: {CLASSIFICATION_TYPE.capitalize()} Class Classification"
+        )
+    )
 
     # Load Preprocessed Dataset
     patch_pickle_loading()
-    with open(dataset_path, "rb") as f:
-        dataset = pickle.load(f)
-    print(f"Loaded dataset from {dataset_path}")
 
+    try:
+        with open(dataset_path, "rb") as f:
+            dataset = pickle.load(f)
+        print(success(f"Success: Dataset '{dataset_path}' successfully loaded"))
+    except Exception as e:
+        print(fail(f"Failed: Dataset '{dataset_path}' failed to load"))
+        raise e
 
     ################################################################################
     # SEED CONFIG
     ################################################################################
     SEED_VAL = args.seed
     set_seed(SEED_VAL)
-
+    print(success(f"Seed value set for training run: {SEED_VAL}"))
 
     ################################################################################
     # TRAINING-HYPERPARAMETERS
@@ -137,7 +158,6 @@ def main():
     # % of data to randomly drop for regularization
     DATA_DROP_RATIO = 0.10
 
-
     ################################################################################
     # MODEL-CONFIG
     ################################################################################
@@ -170,14 +190,18 @@ def main():
 
     # Device Set (GPU if avail else CPU)
     DEVICE = torch.device(args.device)
-
+    print(success(f"Device Set: {DEVICE}"))
 
     ################################################################################
     #  WANDB & HUGGINGFACE CONFIG
     ################################################################################
     # WANDB: Key and Login
-    wandb.login(key=args.wandb_api_key)
-
+    try:
+        wandb.login(key=args.wandb_api_key)
+        print(success("Success: WandB API key authenticated."))
+    except Exception as e:
+        print(fail("Failed: WandB API key authentication failed."))
+        raise e
 
     # WANDB RUN COMPS
     PAPER_TASK = "rbtransformer-eeg-recognition"
@@ -186,22 +210,24 @@ def main():
     RUN_ID = "0001"
     WANDB_RUN_NAME = f"{PAPER_TASK}-{DATASET_NAME}-{CLASSIFICATION_TYPE}-{DIMENSION}-{TASK_TYPE_SUFFIX}-{RUN_TAG}-{RUN_ID}"
 
-
     # HF: Key and Login
-    login(token=args.hf_token)
-
+    try:
+        login(token=args.hf_token)
+        print(success("Success: Hugging Face token authenticated."))
+    except Exception as e:
+        print(fail("Failed: Hugging Face token authentication failed."))
+        raise e
 
     # HF MODEL REPO_ID
     USERNAME = args.hf_username
     BASE_REPO_ID = f"{USERNAME}/{DATASET_NAME}-{CLASSIFICATION_TYPE}-{DIMENSION}-Kfold"
-
 
     ################################################################################
     # REGULARIZATION: DATA DROPOUT
     ################################################################################
     X_full = []
     y_full = []
-    for i in tqdm(range(len(dataset)), desc="Extracting data for SMOTE"):
+    for i in range(len(dataset)):
         x, y = dataset[i]
         X_full.append(x.squeeze(0).numpy().flatten())
         y_full.append(y)
@@ -217,7 +243,6 @@ def main():
     kept_indices = all_indices[drop_count:]
     X_full = X_full[kept_indices]
     y_full = y_full[kept_indices]
-
 
     ################################################################################
     # K-FOLD TRAINING
@@ -236,16 +261,18 @@ def main():
         smote = SMOTE(random_state=SEED_VAL)
         X_train_balanced, y_train_balanced = smote.fit_resample(X_train, y_train)
 
-        train_dataset = DatasetReshape(X_train_balanced, y_train_balanced, NUM_ELECTRODES)
+        train_dataset = DatasetReshape(
+            X_train_balanced, y_train_balanced, NUM_ELECTRODES
+        )
         val_dataset = DatasetReshape(X_val, y_val, NUM_ELECTRODES)
 
-        balanced_counts = Counter(y_train_balanced)
-        print(f"\nFold {fold + 1} Training Set Class Balance (After SMOTE):")
-        print(f"Total samples: {len(y_train_balanced)}")
-        for cls, count in balanced_counts.items():
-            print(
-                f"Class {cls}: {count} samples ({count / len(y_train_balanced) * 100:.2f}%)"
-            )
+        # balanced_counts = Counter(y_train_balanced)
+        # print(f"\nFold {fold + 1} Training Set Class Balance (After SMOTE):")
+        # print(f"Total samples: {len(y_train_balanced)}")
+        # for cls, count in balanced_counts.items():
+        #     print(
+        #         f"Class {cls}: {count} samples ({count / len(y_train_balanced) * 100:.2f}%)"
+        #     )
 
         val_loader = DataLoader(
             val_dataset,
@@ -360,7 +387,9 @@ def main():
             precision = precision_score(
                 all_targets, all_preds, average="macro", zero_division=0
             )
-            recall = recall_score(all_targets, all_preds, average="macro", zero_division=0)
+            recall = recall_score(
+                all_targets, all_preds, average="macro", zero_division=0
+            )
             f1 = f1_score(all_targets, all_preds, average="macro", zero_division=0)
 
             # Log config and metrics to WandB
@@ -399,7 +428,6 @@ def main():
         )
 
         wandb.finish()
-
 
 
 if __name__ == "__main__":
