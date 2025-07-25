@@ -7,11 +7,14 @@ TICK = "[✓]"
 CROSS = "[✗]"
 WARN = "[!]"
 
+
 def success(msg: str) -> str:
     return f"{GREEN}{TICK} {msg}{RESET}"
 
+
 def fail(msg: str) -> str:
     return f"{RED}{CROSS} {msg}{RESET}"
+
 
 def caution(msg: str) -> str:
     return f"{YELLOW}{WARN} {msg}{RESET}"
