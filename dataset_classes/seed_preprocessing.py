@@ -32,9 +32,10 @@ class SEED(BaseDatasetPreprocessing):
             num_workers=num_workers,
         )
 
-
     @staticmethod
-    def read_record(record: str, root_path: str = "./Preprocessed_EEG", **kwargs) -> Dict:
+    def read_record(
+        record: str, root_path: str = "./Preprocessed_EEG", **kwargs
+    ) -> Dict:
         """
         Reads a record from the SEED dataset and returns the samples and labels.
 
@@ -55,14 +56,7 @@ class SEED(BaseDatasetPreprocessing):
         )["label"][0]
         return {"samples": samples, "labels": labels}
 
-
-    def process_record(
-        self,
-        record: str,
-        samples: Dict,
-        labels: np.ndarray,
-        **kwargs
-    ):
+    def process_record(self, record: str, samples: Dict, labels: np.ndarray, **kwargs):
         """
         Processes EEG samples from a SEED record and yields fixed-length segments along with corresponding labels.
 
@@ -100,7 +94,6 @@ class SEED(BaseDatasetPreprocessing):
                 baseline_sample=None,
             )
 
-
     def set_records(self, root_path: str = "./Preprocessed_EEG", **kwargs):
         """
         Returns the list of all records in the SEED dataset directory.
@@ -121,11 +114,7 @@ if __name__ == "__main__":
     #####################################################################################################
     #                                  SEED-MULTI-DATASET-PREPROCESSING                                 #
     #####################################################################################################
-    label_transform = StackTransforms(
-        [
-            Select("emotion"), 
-            Lambda(add_by_one)
-         ])
+    label_transform = StackTransforms([Select("emotion"), Lambda(add_by_one)])
 
     seed_multi_dataset = SEED(
         root_path="./Preprocessed_EEG",

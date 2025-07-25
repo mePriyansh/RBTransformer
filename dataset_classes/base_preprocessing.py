@@ -92,7 +92,6 @@ class BaseDatasetPreprocessing(Dataset):
                 for tag, data in eegs.items():
                     self._eeg_memory[tag].update(data)
 
-
     def handle_record(
         self,
         record: Any,
@@ -133,7 +132,6 @@ class BaseDatasetPreprocessing(Dataset):
                 infos.append(obj["info"])
 
         return infos, eegs
-
 
     def _yield_windows(
         self,
@@ -198,14 +196,12 @@ class BaseDatasetPreprocessing(Dataset):
 
         return write_ptr
 
-
     def __len__(self) -> int:
         """
         Returns:
             int: Total number of preprocessed EEG windows in the dataset.
         """
         return len(self._info_memory)
-
 
     def __getitem__(self, index: int) -> Tuple:
         """

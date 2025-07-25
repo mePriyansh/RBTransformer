@@ -3,7 +3,13 @@ import pickle
 import numpy as np
 from dataset_classes.base_preprocessing import BaseDatasetPreprocessing
 from typing import Callable, Dict, Union
-from preprocessing.transformations import StackTransforms, Lambda, Select, Binarize, subtract_by_one
+from preprocessing.transformations import (
+    StackTransforms,
+    Lambda,
+    Select,
+    Binarize,
+    subtract_by_one,
+)
 
 
 #####################################################################################################
@@ -36,9 +42,10 @@ class DEAP(BaseDatasetPreprocessing):
             num_workers=num_workers,
         )
 
-
     @staticmethod
-    def read_record(record: str, root_path: str = "./data_preprocessed_python", **kwargs) -> Dict:
+    def read_record(
+        record: str, root_path: str = "./data_preprocessed_python", **kwargs
+    ) -> Dict:
         """
         Reads a record from the DEAP dataset and returns the samples and labels.
 
@@ -55,13 +62,8 @@ class DEAP(BaseDatasetPreprocessing):
         labels = pkl_data["labels"]
         return {"samples": samples, "labels": labels}
 
-
     def process_record(
-        self,
-        record: str,
-        samples: np.ndarray,
-        labels: np.ndarray,
-        **kwargs
+        self, record: str, samples: np.ndarray, labels: np.ndarray, **kwargs
     ):
         """
         Processes EEG samples from a DEAP record and yields fixed-length segments along with corresponding labels.
@@ -103,7 +105,6 @@ class DEAP(BaseDatasetPreprocessing):
                 start_at=start_at,
                 baseline_sample=trial_baseline_sample,
             )
-
 
     def set_records(self, root_path: str = "./data_preprocessed_python", **kwargs):
         """
@@ -238,9 +239,7 @@ if __name__ == "__main__":
     #####################################################################################################
     #                            DEAP-MULTI-DOMINANCE-DATASET-PREPROCESSING                             #
     #####################################################################################################
-    label_transform = StackTransforms(
-        [Select("dominance"), Lambda(subtract_by_one)]
-    )
+    label_transform = StackTransforms([Select("dominance"), Lambda(subtract_by_one)])
 
     deap_multi_dominance_dataset = DEAP(
         root_path="./data_preprocessed_python",

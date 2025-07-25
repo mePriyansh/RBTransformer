@@ -3,7 +3,13 @@ import pickle
 import scipy.io as scio
 from dataset_classes.base_preprocessing import BaseDatasetPreprocessing
 from typing import Callable, Dict, Union
-from preprocessing.transformations import StackTransforms, Lambda, Select, Binarize, subtract_by_one
+from preprocessing.transformations import (
+    StackTransforms,
+    Lambda,
+    Select,
+    Binarize,
+    subtract_by_one,
+)
 
 
 #####################################################################################################
@@ -34,7 +40,6 @@ class DREAMER(BaseDatasetPreprocessing):
             num_workers=num_workers,
         )
 
-
     @staticmethod
     def read_record(record: str, root_path: str = "./DREAMER.mat", **kwargs) -> Dict:
         """
@@ -50,13 +55,7 @@ class DREAMER(BaseDatasetPreprocessing):
         mat_data = scio.loadmat(root_path, verify_compressed_data_integrity=False)
         return {"mat_data": mat_data}
 
-
-    def process_record(
-        self,
-        record: str,
-        mat_data: Dict,
-        **kwargs
-    ):
+    def process_record(self, record: str, mat_data: Dict, **kwargs):
         """
         Processes EEG samples from a DREAMER record and yields fixed-length segments along with corresponding labels.
 
@@ -118,7 +117,6 @@ class DREAMER(BaseDatasetPreprocessing):
                 start_at=0,
                 baseline_sample=trial_baseline_sample,
             )
-
 
     def set_records(self, root_path: str = "./DREAMER.mat", **kwargs):
         """
@@ -255,9 +253,7 @@ if __name__ == "__main__":
     #####################################################################################################
     #                           DREAMER-MULTI-DOMINANCE-DATASET-PREPROCESSING                           #
     #####################################################################################################
-    label_transform = StackTransforms(
-        [Select("dominance"), Lambda(subtract_by_one)]
-    )
+    label_transform = StackTransforms([Select("dominance"), Lambda(subtract_by_one)])
 
     dreamer_multi_dominance_dataset = DREAMER(
         root_path="./DREAMER.mat",
