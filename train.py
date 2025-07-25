@@ -204,7 +204,7 @@ def main():
         raise e
 
     # WANDB RUN COMPS
-    PAPER_TASK = "rbtransformer-eeg-recognition"
+    PAPER_TASK = "α-rbtransformer-eeg-recognition"
     TASK_TYPE_SUFFIX = "class-classification"
     RUN_TAG = "sota-run"
     RUN_ID = "0001"
