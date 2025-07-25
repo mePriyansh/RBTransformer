@@ -11,11 +11,12 @@ from utils.seed import set_seed
 from huggingface_hub import login
 from model.model import RBTransformer
 from torch.utils.data import DataLoader
-from preprocessing import DatasetReshape
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import KFold
 from utils.push_to_hf import push_model_to_hub
 import torch.optim.lr_scheduler as lr_scheduler
+from utils.pickle_patch import patch_pickle_loading
+from preprocessing.transformations import DatasetReshape
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
 
@@ -24,88 +25,124 @@ from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_sc
 ################################################################################
 PREPROCESSED_DATASETS = {
     "deap": {
-        "valence": {
-            "binary": "preprocessed_datasets/deap_binary_valence_dataset.pkl",
-            "multiclass": "preprocessed_datasets/deap_multi_valence_dataset.pkl",
+        "binary": {
+            "valence": "preprocessed_datasets/deap_binary_valence_dataset.pkl",
+            "arousal": "preprocessed_datasets/deap_binary_arousal_dataset.pkl",
+            "dominance": "preprocessed_datasets/deap_binary_dominance_dataset.pkl",
         },
-        "arousal": {
-            "binary": "preprocessed_datasets/deap_binary_arousal_dataset.pkl",
-            "multiclass": "preprocessed_datasets/deap_multi_arousal_dataset.pkl",
-        },
-        "dominance": {
-            "binary": "preprocessed_datasets/deap_binary_dominance_dataset.pkl",
-            "multiclass": "preprocessed_datasets/deap_multi_dominance_dataset.pkl",
+        "multi": {
+            "valence": "preprocessed_datasets/deap_multi_valence_dataset.pkl",
+            "arousal": "preprocessed_datasets/deap_multi_arousal_dataset.pkl",
+            "dominance": "preprocessed_datasets/deap_multi_dominance_dataset.pkl",
         },
     },
     "dreamer": {
-        "valence": {
-            "binary": "preprocessed_datasets/dreamer_binary_valence_dataset.pkl",
-            "multiclass": "preprocessed_datasets/dreamer_multi_valence_dataset.pkl",
+        "binary": {
+            "valence": "preprocessed_datasets/dreamer_binary_valence_dataset.pkl",
+            "arousal": "preprocessed_datasets/dreamer_binary_arousal_dataset.pkl",
+            "dominance": "preprocessed_datasets/dreamer_binary_dominance_dataset.pkl",
         },
-        "arousal": {
-            "binary": "preprocessed_datasets/dreamer_binary_arousal_dataset.pkl",
-            "multiclass": "preprocessed_datasets/dreamer_multi_arousal_dataset.pkl",
-        },
-        "dominance": {
-            "binary": "preprocessed_datasets/dreamer_binary_dominance_dataset.pkl",
-            "multiclass": "preprocessed_datasets/dreamer_multi_dominance_dataset.pkl",
+        "multi": {
+            "valence": "preprocessed_datasets/dreamer_multi_valence_dataset.pkl",
+            "arousal": "preprocessed_datasets/dreamer_multi_arousal_dataset.pkl",
+            "dominance": "preprocessed_datasets/dreamer_multi_dominance_dataset.pkl",
         },
     },
     "seed": {
-        "emotion": {"multiclass": "preprocessed_datasets/seed_multi_dataset.pkl"},
+        "multi": {
+            "emotion": "preprocessed_datasets/seed_multi_emotion_dataset.pkl",
+        },
     },
 }
 
-dataset_name = "dreamer"
-label_name = "valence"
-task_type = "binary"
 
-dataset_path = PREPROCESSED_DATASETS[dataset_name][label_name][task_type]
+# Select Preprocessed Dataset
+DATASET_NAME = "deap"  # Options: "seed", "deap", "dreamer"
+CLASSIFICATION_TYPE = "multi"  # Options: "multi" For SEED; "binary", "multi" For DEAP/DREAMER
+DIMENSION = "arousal"  # Options: "emotion" For SEED, "valence", "arousal", "dominance" For DEAP/DREAMER
+dataset_path = PREPROCESSED_DATASETS[DATASET_NAME][CLASSIFICATION_TYPE][DIMENSION]
 
+
+# Load Preprocessed Dataset
+patch_pickle_loading()
 with open(dataset_path, "rb") as f:
     dataset = pickle.load(f)
-
 print(f"Loaded dataset from {dataset_path}")
 
 
 ################################################################################
 # SEED CONFIG
 ################################################################################
-SEED = 23
-set_seed(SEED)
+SEED_VAL = 23
+set_seed(SEED_VAL)
 
 
 ################################################################################
-# TRAINING-PARAMETERS
+# TRAINING-HYPERPARAMETERS
 ################################################################################
-num_epochs = 300
-kfolds = 5
-initial_batch_size = 256
-reduced_batch_size = 64
-initial_learning_rate = 1e-3
-minimum_learning_rate = 1e-6
-weight_decay = 1e-3
-label_smoothing = 0.12
-num_workers = 4
-data_drop_ratio = 0.10
+# Number of training epochs
+NUM_EPOCHS = 300
+
+# Number of folds for K-FoldCV
+KFOLDS = 5
+
+# Initial batch size, First half of training
+INITIAL_BATCH_SIZE = 256
+
+# Reduced batch size, Second half of training
+REDUCED_BATCH_SIZE = 64
+
+# Starting learning rate
+INITIAL_LEARNING_RATE = 1e-3
+
+# Minimum learning rate
+MINIMUM_LEARNING_RATE = 1e-6
+
+# Weight decay for regularization
+WEIGHT_DECAY = 1e-3
+
+# Label smoothing for loss function
+LABEL_SMOOTHING = 0.12
+
+# Number of workers for data loading
+NUM_WORKERS = 8
+
+# % of data to randomly drop for regularization
+DATA_DROP_RATIO = 0.10
 
 
 ################################################################################
 # MODEL-CONFIG
 ################################################################################
-num_electrodes = 14
-bde_dim = 4
-embed_dim = 128
-depth = 4
-heads = 6
-head_dim = 32
-mlp_hidden_dim = 128
-dropout = 0.1
-num_classes = 2  # For DEAP and Dreamer Binary-Class Classification Training: 2
-# For SEED Multi-Class Classification Training: 3
-# For Dreamer Multi-Class Classification Training: 5
-# For Deap Multi-Class Classification Training: 9
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# Number of electrodes in datasets (SEED=62, DEAP=32, DREAMER=14)
+NUM_ELECTRODES = 62
+
+# Number of logit classes (SEED=3, DEAP-binary=2, DEAP-multi=9, DREAMER-binary=2, DREAMER-multi=5)
+NUM_CLASSES = 3
+
+# BDE Tokens dim
+BDE_DIM = 4
+
+# Projected dimension of BDE tokens
+EMBED_DIM = 128
+
+# Number of InterCorticalAttention Transformer Blocks
+DEPTH = 4
+
+# Number of parallel attention heads per InterCorticalAttention Transformer Block
+HEADS = 6
+
+# Dim of individual attention head in MHSA
+HEAD_DIM = 32
+
+# Hidden layer dimension of the Feed-Forward Network (FFN)
+MLP_HIDDEN_DIM = 128
+
+# Dropout Prob
+DROPOUT = 0.1
+
+# Device Set (GPU if avail else CPU)
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 ################################################################################
@@ -113,25 +150,27 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 ################################################################################
 load_dotenv()
 
-# WANDB-CONFIGS
+# WANDB: Key and Login
 WANDB_API_KEY = os.getenv("WANDB_API_KEY")
 wandb.login(key=WANDB_API_KEY)
 
-paper_task = "γ-eeg-recognition"
-dataset_name = "dreamer"
-benchmark_column = "valence"
-task_type = "binary-classification"
-random_hash = "sota-run"
-test_run_num = "0001"
-wandb_run_name = f"{paper_task}-{dataset_name}-{benchmark_column}-{task_type}-{random_hash}-{test_run_num}"
+
+# WANDB RUN COMPS
+PAPER_TASK = "γ-eeg-recognition-desmodso"
+TASK_TYPE_SUFFIX = "class-classification"
+RANDOM_HASH = "sota-run"
+TEST_RUN_NUM = "0001"
+WANDB_RUN_NAME = f"{PAPER_TASK}-{DATASET_NAME}-{CLASSIFICATION_TYPE}-{DIMENSION}-{TASK_TYPE_SUFFIX}-{RANDOM_HASH}-{TEST_RUN_NUM}"
 
 
-# HF-CONFIG
+# HF: Key and Login
 HF_TOKEN = os.getenv("HF_TOKEN")
 login(token=HF_TOKEN)
 
-username = "<YOUR_USERNAME>"
-base_repo_id = f"{username}/{dataset_name}-{benchmark_column}-{task_type}-Kfold"
+
+# HF MODEL REPO_ID
+USERNAME = "<YOUR_USERNAME>"
+BASE_REPO_ID = f"{USERNAME}/{DATASET_NAME}-{CLASSIFICATION_TYPE}-{DIMENSION}-Kfold"
 
 
 ################################################################################
@@ -147,9 +186,8 @@ for i in tqdm(range(len(dataset)), desc="Extracting data for SMOTE"):
 X_full = np.array(X_full)
 y_full = np.array(y_full)
 
-data_drop_ratio = data_drop_ratio
 num_samples = len(X_full)
-drop_count = int(num_samples * data_drop_ratio)
+drop_count = int(num_samples * DATA_DROP_RATIO)
 all_indices = np.arange(num_samples)
 
 np.random.shuffle(all_indices)
@@ -161,21 +199,22 @@ y_full = y_full[kept_indices]
 ################################################################################
 # K-FOLD TRAINING
 ################################################################################
-kf = KFold(n_splits=kfolds, shuffle=True, random_state=SEED)
+kf = KFold(n_splits=KFOLDS, shuffle=True, random_state=SEED_VAL)
 
 for fold, (train_idx, val_idx) in enumerate(kf.split(range(len(y_full)))):
-    print(f"\nFold {fold + 1}/{kfolds}")
+    print(f"\nFold {fold + 1}/{KFOLDS}")
 
     X_train = X_full[train_idx]
     y_train = y_full[train_idx]
     X_val = X_full[val_idx]
     y_val = y_full[val_idx]
 
-    smote = SMOTE(random_state=SEED)
+    # Applying SMOTE to the training set
+    smote = SMOTE(random_state=SEED_VAL)
     X_train_balanced, y_train_balanced = smote.fit_resample(X_train, y_train)
 
-    train_dataset = DatasetReshape(X_train_balanced, y_train_balanced, num_electrodes)
-    val_dataset = DatasetReshape(X_val, y_val, num_electrodes)
+    train_dataset = DatasetReshape(X_train_balanced, y_train_balanced, NUM_ELECTRODES)
+    val_dataset = DatasetReshape(X_val, y_val, NUM_ELECTRODES)
 
     balanced_counts = Counter(y_train_balanced)
     print(f"\nFold {fold + 1} Training Set Class Balance (After SMOTE):")
@@ -187,58 +226,65 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(range(len(y_full)))):
 
     val_loader = DataLoader(
         val_dataset,
-        batch_size=initial_batch_size,
+        batch_size=INITIAL_BATCH_SIZE,
         shuffle=False,
-        num_workers=num_workers,
+        num_workers=NUM_WORKERS,
     )
 
+    # Init RBTransformer and moving it to the device
     model = RBTransformer(
-        num_electrodes=num_electrodes,
-        bde_dim=bde_dim,
-        embed_dim=embed_dim,
-        depth=depth,
-        heads=heads,
-        head_dim=head_dim,
-        mlp_hidden_dim=mlp_hidden_dim,
-        dropout=dropout,
-        num_classes=num_classes,
+        num_electrodes=NUM_ELECTRODES,
+        bde_dim=BDE_DIM,
+        embed_dim=EMBED_DIM,
+        depth=DEPTH,
+        heads=HEADS,
+        head_dim=HEAD_DIM,
+        mlp_hidden_dim=MLP_HIDDEN_DIM,
+        dropout=DROPOUT,
+        num_classes=NUM_CLASSES,
     )
-    model = model.to(device)
+    model = model.to(DEVICE)
 
-    criterion = nn.CrossEntropyLoss(label_smoothing=label_smoothing)
+    # loss, optimizer, and scheduler
+    criterion = nn.CrossEntropyLoss(label_smoothing=LABEL_SMOOTHING)
     optimizer = torch.optim.AdamW(
-        model.parameters(), lr=initial_learning_rate, weight_decay=weight_decay
+        model.parameters(), lr=INITIAL_LEARNING_RATE, weight_decay=WEIGHT_DECAY
     )
     scheduler = lr_scheduler.CosineAnnealingLR(
-        optimizer, T_max=num_epochs, eta_min=minimum_learning_rate
+        optimizer, T_max=NUM_EPOCHS, eta_min=MINIMUM_LEARNING_RATE
     )
 
+    # Init WandB for current fold
     wandb.init(
-        project=wandb_run_name,
-        group="dreamer-binary-valence",
+        project=WANDB_RUN_NAME,
+        group=f"{DATASET_NAME}-{CLASSIFICATION_TYPE}-{DIMENSION}",
         name=f"Kfold-Run-{fold + 1}",
         config={
-            "learning_rate": initial_learning_rate,
-            "min_learning_rate": minimum_learning_rate,
-            "num_epochs": num_epochs,
+            "learning_rate": INITIAL_LEARNING_RATE,
+            "minimum_learning_rate": MINIMUM_LEARNING_RATE,
+            "num_epochs": NUM_EPOCHS,
             "model": "RBTransformer",
-            "num_folds": kfolds,
+            "num_folds": KFOLDS,
             "fold": fold + 1,
             "optimizer": "AdamW",
             "scheduler": "CosineAnnealingLR",
         },
     )
 
-    for epoch in range(num_epochs):
+    for epoch in range(NUM_EPOCHS):
         if epoch < 150:
-            current_batch_size = initial_batch_size
+            current_batch_size = INITIAL_BATCH_SIZE
         else:
-            current_batch_size = reduced_batch_size
+            current_batch_size = REDUCED_BATCH_SIZE
 
         train_loader = DataLoader(
-            train_dataset, batch_size=current_batch_size, shuffle=True, num_workers=4
+            train_dataset,
+            batch_size=current_batch_size,
+            shuffle=True,
+            num_workers=NUM_WORKERS,
         )
 
+        # Training loop
         model.train()
         train_loss = 0.0
         train_correct = 0
@@ -246,10 +292,10 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(range(len(y_full)))):
 
         for batch in tqdm(
             train_loader,
-            desc=f"Fold {fold + 1} Epoch {epoch + 1}/{num_epochs} - Training",
+            desc=f"Fold {fold + 1} Epoch {epoch + 1}/{NUM_EPOCHS} - Training",
         ):
             x, y = batch
-            x, y = x.to(device), y.to(device)
+            x, y = x.to(DEVICE), y.to(DEVICE)
             optimizer.zero_grad()
             outputs = model(x)
             loss = criterion(outputs, y)
@@ -266,6 +312,7 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(range(len(y_full)))):
         train_accuracy = train_correct / train_total
         avg_train_loss = train_loss / len(train_loader)
 
+        # Eval loop
         model.eval()
         val_loss = 0.0
         all_preds = []
@@ -274,7 +321,7 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(range(len(y_full)))):
         with torch.no_grad():
             for batch in val_loader:
                 x, y = batch
-                x, y = x.to(device), y.to(device)
+                x, y = x.to(DEVICE), y.to(DEVICE)
                 outputs = model(x)
                 loss = criterion(outputs, y)
                 val_loss += loss.item()
@@ -285,6 +332,7 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(range(len(y_full)))):
 
         avg_val_loss = val_loss / len(val_loader)
 
+        # Calculate eval metrics
         val_accuracy = accuracy_score(all_targets, all_preds)
         precision = precision_score(
             all_targets, all_preds, average="macro", zero_division=0
@@ -292,6 +340,7 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(range(len(y_full)))):
         recall = recall_score(all_targets, all_preds, average="macro", zero_division=0)
         f1 = f1_score(all_targets, all_preds, average="macro", zero_division=0)
 
+        # Log config and metrics to WandB
         wandb.log(
             {
                 "epoch": epoch + 1,
@@ -307,7 +356,8 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(range(len(y_full)))):
             }
         )
 
-        tqdm.write(f"\n[Fold {fold + 1}] Epoch {epoch + 1}/{num_epochs}")
+        # Log config and metrics to terminal
+        tqdm.write(f"\n[Fold {fold + 1}] Epoch {epoch + 1}/{NUM_EPOCHS}")
         tqdm.write(f"Train Loss     : {avg_train_loss:.4f}")
         tqdm.write(f"Train Accuracy : {train_accuracy:.4f}")
         tqdm.write(f"Val Loss       : {avg_val_loss:.4f}")
@@ -318,9 +368,10 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(range(len(y_full)))):
         tqdm.write(f"Learning Rate  : {optimizer.param_groups[0]['lr']:.6f}")
         tqdm.write(f"Batch Size     : {current_batch_size}")
 
+    # Push model to Hub
     push_model_to_hub(
         model=model,
-        repo_id=f"{base_repo_id}-{fold + 1}",
+        repo_id=f"{BASE_REPO_ID}-{fold + 1}",
         commit_message=f"Upload of trained RBTransformer on Kfold-{fold + 1} run",
     )
 
