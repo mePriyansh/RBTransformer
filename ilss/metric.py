@@ -48,7 +48,7 @@ class ILSS:
             float: ILSS score, bounded between 0 and 10.
         """
         numerator = std_dev
-        denominator = 1 + self.lambda_ * (mean_accuracy ** 2.5)
+        denominator = 1 + self.lambda_ * (mean_accuracy**2.5)
         log_term = np.log10((numerator / denominator) + self.epsilon)
         ilss_uncapped = -log_term
         ilss_capped = min(ilss_uncapped, 10)
