@@ -176,7 +176,7 @@ def main():
 
     # HF MODEL REPO_ID
     USERNAME = args.hf_username
-    BASE_REPO_ID = f"{ABLATION_TAG_PREFIX}-{USERNAME}/{DATASET_NAME}-{CLASSIFICATION_TYPE}-{DIMENSION}-{ABLATION_TAG}-Kfold"
+    BASE_REPO_ID = f"{USERNAME}/{ABLATION_TAG_PREFIX}-{DATASET_NAME}-{CLASSIFICATION_TYPE}-{DIMENSION}-{ABLATION_TAG}-Kfold"
 
     ################################################################################
     # REGULARIZATION: DATA DROPOUT
