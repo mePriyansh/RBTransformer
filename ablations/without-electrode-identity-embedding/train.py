@@ -24,7 +24,7 @@ from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_sc
 ################################################################################
 # ABLATION-TAG
 ################################################################################
-ABLATION_TAG_PREFIX = "[abl]"
+ABLATION_TAG_PREFIX = "abl"
 ABLATION_TAG = "without-electrode-identity-embedding"
 
 ################################################################################
