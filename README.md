@@ -53,7 +53,8 @@ To ensure scripts run correctly across environments, set the `PYTHONPATH` to the
 
 ## 3. SCRIPTS
 
-### <u>I. PREPROCESSING DATASETS SCRIPTS</u>
+### I. PREPROCESSING DATASETS SCRIPTS
+---
 
 RBTransformer is evaluated on three benchmark EEG datasets: SEED, DEAP, and DREAMER along their respective affective dimensions, for both Binary and Multi-Class Classification tasks.
 
@@ -100,7 +101,8 @@ python dataset_classes/seed_preprocessing.py
 
 This preprocesses the SEED dataset across the sole emotion dimension for multi-class classification, resulting in 1 `.pkl` file.
 
-### <u>II. TRAINING SCRIPTS</u>
+### II. TRAINING SCRIPTS
+---
 
 RBTransformer was evaluated on the SEED, DEAP, and DREAMER datasets across their affective dimensions, emotion for SEED, and valence, arousal, dominance for DEAP and DREAMER, for both Binary and Multi-Class classification settings.
 
@@ -139,7 +141,8 @@ Replace the following:
 
 * `<WANDB_API_KEY>`: Your Weights & Biases API key (for logging training metrics)
 
-### <u>III. ABLATION SCRIPTS</u>
+### III. ABLATION SCRIPTS
+---
 
 RBTransformer was ablated on the DREAMER dataset along the Arousal dimension for Binary Classification tasks.
 
@@ -181,7 +184,8 @@ Replace the following:
 
 All training and ablation runs were logged using Weights & Biases, across all 5 folds of their respective experiments. The logged training configurations, evaluation metrics, and system details for all 13 training runs and 6 ablation runs can be accessed using the links below.
 
-### <u>I. TRAINING LOGS</u>
+### I. TRAINING LOGS
+---
 
 | #  | Dataset | Task Type                   | Dimension | W\&B Project Link                                                                                                                                       |
 | -- | ------- | --------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -199,7 +203,8 @@ All training and ablation runs were logged using Weights & Biases, across all 5 
 | 12 | DREAMER | Binary-Class Classification | Arousal   | [View Logs](https://wandb.ai/nnilayy/%CE%B1-rbtransformer-eeg-recognition-dreamer-binary-arousal-class-classification-sota-run-0001?nw=nwusernnilayy)   |
 | 13 | DREAMER | Binary-Class Classification | Dominance | [View Logs](https://wandb.ai/nnilayy/%CE%B1-rbtransformer-eeg-recognition-dreamer-binary-dominance-class-classification-sota-run-0001?nw=nwusernnilayy) |
 
-### <u>II. ABLATION LOGS</u>
+### II. ABLATION LOGS
+---
 
 | # | Dataset | Task Type                   | Dimension | Ablation                             | W\&B Project Link                                                                                                                                                                     |
 | - | ------- | --------------------------- | --------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -216,7 +221,8 @@ All training and ablation runs were logged using Weights & Biases, across all 5 
 
 Similarly, all trained and ablated model checkpoints were saved on Hugging Face across all 5 folds of their respective experiments. The full set of pretrained weights—including fold-specific model checkpoints—for all 13 training runs and 6 ablation configurations can be accessed using the links below.
 
-### <u>I. TRAINED MODEL CHECKPOINTS</u>
+### I. TRAINED MODEL CHECKPOINTS
+---
 
 | #  | Dataset | Task Type                   | Dimension | Hugging Face Collection Link                                                                                                             |
 | -- | ------- | --------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -234,7 +240,8 @@ Similarly, all trained and ablated model checkpoints were saved on Hugging Face 
 | 12 | DREAMER | Binary-Class Classification | Arousal   | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-binary-arousal-weights-6854053ec1a6746032c2fc18)          |
 | 13 | DREAMER | Binary-Class Classification | Dominance | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-binary-dominance-weights-68846af96b4462ce01d72be9)        |
 
-### <u>II. ABLATION MODEL CHECKPOINTS</u>
+### II. ABLATION MODEL CHECKPOINTS
+---
 
 | # | Dataset | Task Type                   | Dimension | Ablation                             | Hugging Face Collection Link                                                                                                                 |
 | - | ------- | --------------------------- | --------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
