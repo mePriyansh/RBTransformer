@@ -3,14 +3,14 @@
 <p align="center"><strong>Official PyTorch codebase of RBTransformer from our paper:<br>
 <em>“A Brain Wave Encodes a Thousand Tokens: Modeling Inter-Cortical Neural Interactions for Effective EEG-Based Emotion Recognition”</em></strong></p>
 
-## 1. *OVERVIEW*
+## 1. OVERVIEW
 <p align="center">
   <img src="assets/model-diagram.png" alt="RBTransformer Architecture" width="100%">
 </p>
 <p align="center"><b>Figure 1.</b> Model Architecture of RBTransformer</p>
 
 
-## 2. *INSTALLATION AND SETUP*
+## 2. INSTALLATION AND SETUP
 
 ### I. Installation
 
@@ -168,7 +168,7 @@ Replace the following:
 
 ---
 
-## 3. *W&B: EXPERIMENT LOGS*
+## 3. W&B: EXPERIMENT LOGS
 
 All training runs were tracked using Weights & Biases.  
 Each link below points to a grouped dashboard containing all 5 fold-specific logs per configuration.  
@@ -209,7 +209,7 @@ All key metrics such as **Validation Accuracy**, **F1-Score**, **Precision**, **
 
 ---
 
-## 4. *HUGGING FACE: MODEL CHECKPOINTS*
+## 4. HUGGING FACE: MODEL CHECKPOINTS
 
 The following tables list all pretrained RBTransformer models trained using 5-fold subject-dependent cross-validation.  
 Each link points to a Hugging Face **collection** containing all 5 fold-specific checkpoints.
@@ -247,13 +247,13 @@ Each link points to a Hugging Face **collection** containing all 5 fold-specific
 
 ---
 
-## 5. *CITATION*
+## 5. CITATION
 
 This work is currently **under peer review**.  
 A citation will be added here as soon as the paper is accepted or published.
 
 
-## 6. *VISUALIZATIONS*
+## 6. VISUALIZATIONS
 
 To aid interpretability, we visualize both the learned feature representations and the model’s prediction behavior using t-SNE and confusion matrices.
 
