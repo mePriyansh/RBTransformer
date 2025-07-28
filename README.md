@@ -1,4 +1,4 @@
-<h1 align="center">RBTransformer</h1>
+<h1 align="center"><i>RBTransformer</i></h1>
 
 <p align="center"><strong>Official PyTorch codebase of RBTransformer from our paper:<br>
 <em>“A Brain Wave Encodes a Thousand Tokens: Modeling Inter-Cortical Neural Interactions for Effective EEG-Based Emotion Recognition”</em></strong></p>
@@ -9,10 +9,9 @@
 </p>
 <p align="center"><b>Figure 1.</b> Model Architecture of RBTransformer</p>
 
+---
 
-## 2. INSTALLATION AND SETUP
-
-### I. Installation
+## 2. INSTALLATION, REQUIREMETS AND SETUP 
 
 To get started, first clone the repository from GitHub:
 
@@ -31,19 +30,19 @@ pip install -r requirements.txt
 
 To ensure scripts run correctly across environments, set the `PYTHONPATH` to the root of the project:
 
-* **macOS / Linux (Terminal):**
+* **Linux/macOS:**
 
   ```bash
   export PYTHONPATH=$(pwd)
   ```
 
-* **Windows (PowerShell):**
+* **Windows:**
 
   ```powershell
   $env:PYTHONPATH = (Get-Location).Path
   ```
 
-* **Python Notebooks (Colab, Kaggle, Jupyter):**
+* **Notebooks:**
 
   ```python
   import os
@@ -52,16 +51,18 @@ To ensure scripts run correctly across environments, set the `PYTHONPATH` to the
 
 ---
 
-### II. Preprocessing Datasets
+## 3. SCRIPTS
 
-RBTransformer is evaluated on three benchmark EEG datasets: **SEED**, **DEAP**, and **DREAMER**, along their respective affective dimensions, for both **Binary** and **Multi-Class Classification** tasks.
+### I. Preprocessing Datasets Scripts
+
+RBTransformer is evaluated on three benchmark EEG datasets: SEED, DEAP, and DREAMER along their respective affective dimensions, for both Binary and Multi-Class Classification tasks.
 
 <p align="center">
   <img src="assets/eeg-preprocessing.png" alt="Preprocessing Pipeline" width="100%">
 </p>
 <p align="center"><b>Figure 2.</b> Preprocessing Pipeline for RBTransformer</p>
 
-As illustrated in **Figure 2**, the preprocessing pipeline handles the full data transformation—from raw EEG signals to baseline-corrected BDE tokens—tailored for all **13 prediction tasks**. Once processed, the datasets are saved as `.pkl` files inside the `preprocessed_datasets/` directory and are used directly during training. The table below summarizes all 13 preprocessed dataset files, categorized by Dataset, Dimension, and Task Type:
+As illustrated in Figure 2, the preprocessing pipeline handles the full data transformation—from raw EEG signals to baseline-corrected BDE tokens—tailored for all 13 prediction tasks. Once processed, the datasets are saved as `.pkl` files inside the `preprocessed_datasets/` directory and are used directly during training. The table below summarizes all 13 preprocessed dataset files, categorized by Dataset, Dimension, and Task Type:
 
 | #  | Dataset | Task Type                   | Dimension | Output File                            |
 | -- | ------- | --------------------------- | --------- | -------------------------------------- |
@@ -79,19 +80,29 @@ As illustrated in **Figure 2**, the preprocessing pipeline handles the full data
 | 12 | DREAMER | Binary-Class Classification | Arousal   | `dreamer_binary_arousal_dataset.pkl`   |
 | 13 | DREAMER | Binary-Class Classification | Dominance | `dreamer_binary_dominance_dataset.pkl` |
 
-To generate all 13 preprocessed datasets, simply run the following scripts:
+To generate the 13 preprocessed datasets, run the following scripts:
 
 ```bash
 python dataset_classes/deap_preprocessing.py
+```
+
+This preprocesses the DEAP dataset across valence, arousal, and dominance dimensions for both binary-class classification (3 `.pkl` files) and multi-class classification (3 `.pkl` files), totaling 6 `.pkl` files.
+
+```bash
 python dataset_classes/dreamer_preprocessing.py
+```
+
+This preprocesses the DREAMER dataset across valence, arousal, and dominance dimensions for both binary-class classification (3 `.pkl` files) and multi-class classification (3 `.pkl` files), totaling 6 `.pkl` files.
+
+```bash
 python dataset_classes/seed_preprocessing.py
 ```
 
----
+This preprocesses the SEED dataset across the sole emotion dimension for multi-class classification, resulting in 1 `.pkl` file.
 
-### III. Training Scripts
+### II. Training Scripts
 
-RBTransformer was evaluated on the SEED, DEAP, and DREAMER datasets across their affective dimensions, **emotion** for SEED, and **valence**, **arousal**, **dominance** for DEAP and DREAMER, for both Binary and Multi-Class classification settings.
+RBTransformer was evaluated on the SEED, DEAP, and DREAMER datasets across their affective dimensions, emotion for SEED, and valence, arousal, dominance for DEAP and DREAMER, for both Binary and Multi-Class classification settings.
 
 To train and replicate the results of RBTransformer as indicated in the paper, run the following script with the given configuration options:
 
@@ -128,9 +139,7 @@ Replace the following:
 
 * `<WANDB_API_KEY>`: Your Weights & Biases API key (for logging training metrics)
 
----
-
-### IV. Ablation Scripts
+### III. Ablation Scripts
 
 RBTransformer was ablated on the DREAMER dataset along the Arousal dimension for Binary Classification tasks.
 
@@ -168,13 +177,9 @@ Replace the following:
 
 ---
 
-## 3. W&B: EXPERIMENT LOGS
+## 4. W&B: EXPERIMENT LOGS
 
-All training runs were tracked using Weights & Biases.  
-Each link below points to a grouped dashboard containing all 5 fold-specific logs per configuration.  
-All key metrics such as **Validation Accuracy**, **F1-Score**, **Precision**, **Recall**, **Training Accuracy**, and **Training Loss** are tracked in detail.
-
---- 
+All training and ablation runs were logged using Weights & Biases, across all 5 folds of their respective experiments. The logged training configurations, evaluation metrics, and system details for all 13 training runs and 6 ablation runs can be accessed using the links below.
 
 ### I. Training Logs
 
@@ -194,8 +199,6 @@ All key metrics such as **Validation Accuracy**, **F1-Score**, **Precision**, **
 | 12 | DREAMER | Binary-Class Classification | Arousal   | [View Logs](https://wandb.ai/nnilayy/%CE%B1-rbtransformer-eeg-recognition-dreamer-binary-arousal-class-classification-sota-run-0001?nw=nwusernnilayy)   |
 | 13 | DREAMER | Binary-Class Classification | Dominance | [View Logs](https://wandb.ai/nnilayy/%CE%B1-rbtransformer-eeg-recognition-dreamer-binary-dominance-class-classification-sota-run-0001?nw=nwusernnilayy) |
 
----
-
 ### II. Ablation Logs
 
 | # | Dataset | Task Type                   | Dimension | Ablation                             | W\&B Project Link                                                                                                                                                                     |
@@ -209,10 +212,9 @@ All key metrics such as **Validation Accuracy**, **F1-Score**, **Precision**, **
 
 ---
 
-## 4. HUGGING FACE: MODEL CHECKPOINTS
+## 5. HUGGING FACE: MODEL CHECKPOINTS
 
-The following tables list all pretrained RBTransformer models trained using 5-fold subject-dependent cross-validation.  
-Each link points to a Hugging Face **collection** containing all 5 fold-specific checkpoints.
+Similarly, all trained and ablated model checkpoints were saved on Hugging Face across all 5 folds of their respective experiments. The full set of pretrained weights—including fold-specific model checkpoints—for all 13 training runs and 6 ablation configurations can be accessed using the links below.
 
 ### I. Trained Model Checkpoints
 
@@ -232,8 +234,6 @@ Each link points to a Hugging Face **collection** containing all 5 fold-specific
 | 12 | DREAMER | Binary-Class Classification | Arousal   | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-binary-arousal-weights-6854053ec1a6746032c2fc18)          |
 | 13 | DREAMER | Binary-Class Classification | Dominance | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-binary-dominance-weights-68846af96b4462ce01d72be9)        |
 
----
-
 ### II. Ablation Model Checkpoints
 
 | # | Dataset | Task Type                   | Dimension | Ablation                             | Hugging Face Collection Link                                                                                                                 |
@@ -246,12 +246,6 @@ Each link points to a Hugging Face **collection** containing all 5 fold-specific
 | 6 | DREAMER | Binary-Class Classification | Arousal   | With ADASYN                          | [View Models](https://huggingface.co/collections/nnilayy/abl-with-adasyn-rbtransformer-dreamer-binary-arousal-688605f7581ba118ab5ff380)      |
 
 ---
-
-## 5. CITATION
-
-This work is currently **under peer review**.  
-A citation will be added here as soon as the paper is accepted or published.
-
 
 ## 6. VISUALIZATIONS
 
@@ -267,4 +261,8 @@ To aid interpretability, we visualize both the learned feature representations a
 </p>
 <p align="center"><b>Figure 3b.</b> Confusion matrix illustrating prediction breakdown and misclassification patterns across emotion classes.</p>
 
+---
 
+## 7. CITATION
+
+This work is currently under peer review. A citation will be added here as soon as the paper is accepted or published.
