@@ -226,31 +226,31 @@ Similarly, all trained and ablated model checkpoints were saved on Hugging Face 
 
 | #  | Dataset | Task Type                   | Dimension | Hugging Face Collection Link                                                                                                             |
 | -- | ------- | --------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| 1  | SEED    | Multi-Class Classification  | Emotion   | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-seed-multi-class-classification-weights-685405050ad35ac2317bb718) |
-| 2  | DEAP    | Multi-Class Classification  | Valence   | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-deap-multi-valence-weights-68540512f2302718187e6b73)              |
-| 3  | DEAP    | Multi-Class Classification  | Arousal   | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-deap-multi-arousal-weights-68846a68bff5773cc32c0cbc)              |
-| 4  | DEAP    | Multi-Class Classification  | Dominance | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-deap-multi-dominance-weights-68846a7c5087ab57d5f49746)            |
-| 5  | DEAP    | Binary-Class Classification | Valence   | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-deap-binary-valence-weights-68540522f92909b9c5fa1bab)             |
-| 6  | DEAP    | Binary-Class Classification | Arousal   | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-deap-binary-arousal-weights-68846aa0f6d5858363d80e9e)             |
-| 7  | DEAP    | Binary-Class Classification | Dominance | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-deap-binary-dominance-weights-68846a94a4a33706a17c37f6)           |
-| 8  | DREAMER | Multi-Class Classification  | Valence   | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-multi-valence-weights-68846b1dce02622a9167336a)           |
-| 9  | DREAMER | Multi-Class Classification  | Arousal   | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-multi-arousal-weights-685405310a8788a07fac2357)           |
-| 10 | DREAMER | Multi-Class Classification  | Dominance | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-multi-dominance-weights-68846cfdce02622a916787df)         |
-| 11 | DREAMER | Binary-Class Classification | Valence   | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-binary-valence-weights-68846af11784581c5aca0999)          |
-| 12 | DREAMER | Binary-Class Classification | Arousal   | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-binary-arousal-weights-6854053ec1a6746032c2fc18)          |
-| 13 | DREAMER | Binary-Class Classification | Dominance | [View Models](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-binary-dominance-weights-68846af96b4462ce01d72be9)        |
+| 1  | SEED    | Multi-Class Classification  | Emotion   | [View Model Collection](https://huggingface.co/collections/nnilayy/rbtransformer-seed-multi-class-classification-weights-685405050ad35ac2317bb718) |
+| 2  | DEAP    | Multi-Class Classification  | Valence   | [View Model Collection](https://huggingface.co/collections/nnilayy/rbtransformer-deap-multi-valence-weights-68540512f2302718187e6b73)              |
+| 3  | DEAP    | Multi-Class Classification  | Arousal   | [View Model Collection](https://huggingface.co/collections/nnilayy/rbtransformer-deap-multi-arousal-weights-68846a68bff5773cc32c0cbc)              |
+| 4  | DEAP    | Multi-Class Classification  | Dominance | [View Model Collection](https://huggingface.co/collections/nnilayy/rbtransformer-deap-multi-dominance-weights-68846a7c5087ab57d5f49746)            |
+| 5  | DEAP    | Binary-Class Classification | Valence   | [View Model Collection](https://huggingface.co/collections/nnilayy/rbtransformer-deap-binary-valence-weights-68540522f92909b9c5fa1bab)             |
+| 6  | DEAP    | Binary-Class Classification | Arousal   | [View Model Collection](https://huggingface.co/collections/nnilayy/rbtransformer-deap-binary-arousal-weights-68846aa0f6d5858363d80e9e)             |
+| 7  | DEAP    | Binary-Class Classification | Dominance | [View Model Collection](https://huggingface.co/collections/nnilayy/rbtransformer-deap-binary-dominance-weights-68846a94a4a33706a17c37f6)           |
+| 8  | DREAMER | Multi-Class Classification  | Valence   | [View Model Collection](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-multi-valence-weights-68846b1dce02622a9167336a)           |
+| 9  | DREAMER | Multi-Class Classification  | Arousal   | [View Model Collection](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-multi-arousal-weights-685405310a8788a07fac2357)           |
+| 10 | DREAMER | Multi-Class Classification  | Dominance | [View Model Collection](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-multi-dominance-weights-68846cfdce02622a916787df)         |
+| 11 | DREAMER | Binary-Class Classification | Valence   | [View Model Collection](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-binary-valence-weights-68846af11784581c5aca0999)          |
+| 12 | DREAMER | Binary-Class Classification | Arousal   | [View Model Collection](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-binary-arousal-weights-6854053ec1a6746032c2fc18)          |
+| 13 | DREAMER | Binary-Class Classification | Dominance | [View Model Collection](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-binary-dominance-weights-68846af96b4462ce01d72be9)        |
 
 ### II. ABLATION MODEL CHECKPOINTS
 ---
 
 | # | Dataset | Task Type                   | Dimension | Ablation                             | Hugging Face Collection Link                                                                                                                 |
 | - | ------- | --------------------------- | --------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 | DREAMER | Binary-Class Classification | Arousal   | Without Inter-Cortical Attention     | [View Models](https://huggingface.co/collections/nnilayy/abl-w-o-ic-attention-rbtransformer-dreamer-binary-arousal-68860757036423affcdcb951) |
-| 2 | DREAMER | Binary-Class Classification | Arousal   | Without Weight Decay                 | [View Models](https://huggingface.co/collections/nnilayy/abl-w-o-weight-decay-rbtransformer-dreamer-binary-arousal-6886068d12825c3fe6347b8f) |
-| 3 | DREAMER | Binary-Class Classification | Arousal   | Without SMOTE & Label Smoothing      | [View Models](https://huggingface.co/collections/nnilayy/abl-w-o-smote-and-ls-rbtransformer-dreamer-binary-arousal-688606fbe630a45168f0d1e3) |
-| 4 | DREAMER | Binary-Class Classification | Arousal   | Without Dropout                      | [View Models](https://huggingface.co/collections/nnilayy/abl-w-o-dropout-rbtransformer-dreamer-binary-arousal-68860644ede5d03681f341b7)      |
-| 5 | DREAMER | Binary-Class Classification | Arousal   | Without Electrode Identity Embedding | [View Models](https://huggingface.co/collections/nnilayy/abl-w-o-eie-rbtransformer-dreamer-binary-arousal-68860734f0f7573b8ed81c87)          |
-| 6 | DREAMER | Binary-Class Classification | Arousal   | With ADASYN                          | [View Models](https://huggingface.co/collections/nnilayy/abl-with-adasyn-rbtransformer-dreamer-binary-arousal-688605f7581ba118ab5ff380)      |
+| 1 | DREAMER | Binary-Class Classification | Arousal   | Without Inter-Cortical Attention     | [View Model Collection](https://huggingface.co/collections/nnilayy/abl-w-o-ic-attention-rbtransformer-dreamer-binary-arousal-68860757036423affcdcb951) |
+| 2 | DREAMER | Binary-Class Classification | Arousal   | Without Weight Decay                 | [View Model Collection](https://huggingface.co/collections/nnilayy/abl-w-o-weight-decay-rbtransformer-dreamer-binary-arousal-6886068d12825c3fe6347b8f) |
+| 3 | DREAMER | Binary-Class Classification | Arousal   | Without SMOTE & Label Smoothing      | [View Model Collection](https://huggingface.co/collections/nnilayy/abl-w-o-smote-and-ls-rbtransformer-dreamer-binary-arousal-688606fbe630a45168f0d1e3) |
+| 4 | DREAMER | Binary-Class Classification | Arousal   | Without Dropout                      | [View Model Collection](https://huggingface.co/collections/nnilayy/abl-w-o-dropout-rbtransformer-dreamer-binary-arousal-68860644ede5d03681f341b7)      |
+| 5 | DREAMER | Binary-Class Classification | Arousal   | Without Electrode Identity Embedding | [View Model Collection](https://huggingface.co/collections/nnilayy/abl-w-o-eie-rbtransformer-dreamer-binary-arousal-68860734f0f7573b8ed81c87)          |
+| 6 | DREAMER | Binary-Class Classification | Arousal   | With ADASYN                          | [View Model Collection](https://huggingface.co/collections/nnilayy/abl-with-adasyn-rbtransformer-dreamer-binary-arousal-688605f7581ba118ab5ff380)      |
 
 ---
 
