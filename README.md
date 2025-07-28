@@ -5,7 +5,7 @@
 
 ## 1. *OVERVIEW*
 <p align="center">
-  <img src="assets/model-diagram.png" alt="RBTransformer Architecture" width="80%">
+  <img src="assets/model-diagram.png" alt="RBTransformer Architecture" width="100%">
 </p>
 <p align="center"><b>Figure 1.</b> Model Architecture of RBTransformer</p>
 
@@ -59,7 +59,7 @@ This allows Python to locate internal modules during execution.
 RBTransformer is evaluated on three benchmark EEG datasets: **SEED**, **DEAP**, and **DREAMER**, along their respective affective dimensions, for both **Binary** and **Multi-Class Classification** tasks.
 
 <p align="center">
-  <img src="assets/eeg-preprocessing.png" alt="Preprocessing Pipeline" width="80%">
+  <img src="assets/eeg-preprocessing.png" alt="Preprocessing Pipeline" width="100%">
 </p>
 <p align="center"><b>Figure 2.</b> Preprocessing Pipeline for RBTransformer</p>
 
@@ -256,12 +256,12 @@ A citation will be added here as soon as the paper is accepted or published.
 To aid interpretability, we visualize both the learned feature representations and the model’s prediction behavior using t-SNE and confusion matrices.
 
 <p align="center">
-  <img src="assets/tsne-plots-rbtransformer.png" alt="t-SNE Plot" width="60%">
+  <img src="assets/tsne-plots-rbtransformer.png" alt="t-SNE Plot" width="100%">
 </p>
 <p align="center"><b>Figure 3a.</b> t-SNE visualization of RBTransformer’s latent feature space showing clear emotion-based clustering.</p>
 
 <p align="center">
-  <img src="assets/confusion-matrices.png" alt="Confusion Matrix" width="60%">
+  <img src="assets/confusion-matrices.png" alt="Confusion Matrix" width="100%">
 </p>
 <p align="center"><b>Figure 3b.</b> Confusion matrix illustrating prediction breakdown and misclassification patterns across emotion classes.</p>
 
