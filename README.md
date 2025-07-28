@@ -7,7 +7,7 @@
 <p align="center">
   <img src="assets/model-diagram.png" alt="RBTransformer Architecture" width="100%">
 </p>
-<p align="center" style="font-size: 0.85em; font-style: italic;"><b>Figure 1.</b> Model Architecture of RBTransformer</p>
+<p align="center"><sub><em><b>Figure 1.</b> Model Architecture of RBTransformer</em></sub></p>
 
 
 ## 2. INSTALLATION, REQUIREMENTS AND SETUP 
@@ -57,7 +57,7 @@ RBTransformer is evaluated on three benchmark EEG datasets: SEED, DEAP, and DREA
 <p align="center">
   <img src="assets/eeg-preprocessing.png" alt="Preprocessing Pipeline" width="100%">
 </p>
-<p align="center" style="font-size: 0.85em; font-style: italic;"><b>Figure 2.</b> Preprocessing Pipeline for RBTransformer</p>
+<p align="center"><sub><em><b>Figure 2.</b> Preprocessing Pipeline for RBTransformer</em></sub></p>
 
 As illustrated in Figure 2, the preprocessing pipeline handles the full data transformation—from raw EEG signals to baseline-corrected BDE tokens—tailored for all 13 prediction tasks. Once processed, the datasets are saved as `.pkl` files inside the `preprocessed_datasets/` directory and are used directly during training. The table below summarizes all 13 preprocessed dataset files, categorized by Dataset, Dimension, and Task Type:
 
@@ -209,11 +209,10 @@ All training and ablation runs were logged using Weights & Biases, across all 5 
 
 Below is the bar plot visualization of the ablation results:
 
-<p align="center"> 
-<img src="assets/ablations.png" alt="Ablation Study Visualization" width="100%"> 
-</p> 
-<p align="center" style="font-size: 0.85em; font-style: italic;"><b>Figure 5.</b> Ablation study for binary classification on the DREAMER dataset (Arousal dimension). Top: Impact of Inter-Cortical Attention. Bottom: Impact of training, regularization, and model components including Electrode Identity Embedding, ADASYN, SMOTE with label smoothing, weight decay, and dropout.
+<p align="center">
+  <img src="assets/ablations.png" alt="Ablation Study Visualization" width="100%">
 </p>
+<p align="center"><sub><em><b>Figure 3.</b> Ablation study for binary classification on the DREAMER dataset (Arousal dimension). Top: Impact of Inter-Cortical Attention. Bottom: Impact of training, regularization, and model components including Electrode Identity Embedding, ADASYN, SMOTE with label smoothing, weight decay, and dropout.</em></sub></p>
 
 ## 5. HUGGING FACE: MODEL CHECKPOINTS
 
@@ -256,12 +255,12 @@ To aid interpretability, we visualize both the learned feature representations a
 <p align="center">
   <img src="assets/tsne-plots-rbtransformer.png" alt="t-SNE Plot" width="100%">
 </p>
-<p align="center" style="font-size: 0.85em; font-style: italic;"><b>Figure 3a.</b> t-SNE visualization of RBTransformer’s latent feature space showing clear emotion-based clustering.</p>
+<p align="center"><sub><em><b>Figure 4a.</b> t-SNE visualization of RBTransformer’s latent feature space showing clear emotion-based clustering.</em></sub></p>
 
 <p align="center">
   <img src="assets/confusion-matrices.png" alt="Confusion Matrix" width="100%">
 </p>
-<p align="center" style="font-size: 0.85em; font-style: italic;"><b>Figure 3b.</b> Confusion matrix illustrating prediction breakdown and misclassification patterns across emotion classes.</p>
+<p align="center"><sub><em><b>Figure 4b.</b> Confusion matrix illustrating prediction breakdown and misclassification patterns across emotion classes.</em></sub></p>
 
 
 ## 7. CITATION
