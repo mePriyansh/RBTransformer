@@ -63,21 +63,21 @@ RBTransformer is evaluated on three benchmark EEG datasets: **SEED**, **DEAP**, 
 
 As illustrated in **Figure 2**, the preprocessing pipeline handles the full data transformation—from raw EEG signals to baseline-corrected BDE tokens—tailored for all **13 prediction tasks**. Once processed, the datasets are saved as `.pkl` files inside the `preprocessed_datasets/` directory and are used directly during training. The table below summarizes all 13 preprocessed dataset files, categorized by Dataset, Dimension, and Task Type:
 
-| #  | Dataset | Task Type                  | Dimension | Output File                            |
-|----|---------|----------------------------|-----------|----------------------------------------|
-| 1  | SEED    | Multi-Class Classification | Emotion   | `seed_multi_emotion_dataset.pkl`       |
-| 2  | DEAP    | Multi-Class Classification | Valence   | `deap_multi_valence_dataset.pkl`       |
-| 3  | DEAP    | Multi-Class Classification | Arousal   | `deap_multi_arousal_dataset.pkl`       |
-| 4  | DEAP    | Multi-Class Classification | Dominance | `deap_multi_dominance_dataset.pkl`     |
-| 5  | DEAP    | Binary Classification      | Valence   | `deap_binary_valence_dataset.pkl`      |
-| 6  | DEAP    | Binary Classification      | Arousal   | `deap_binary_arousal_dataset.pkl`      |
-| 7  | DEAP    | Binary Classification      | Dominance | `deap_binary_dominance_dataset.pkl`    |
-| 8  | DREAMER | Multi-Class Classification | Valence   | `dreamer_multi_valence_dataset.pkl`    |
-| 9  | DREAMER | Multi-Class Classification | Arousal   | `dreamer_multi_arousal_dataset.pkl`    |
-| 10 | DREAMER | Multi-Class Classification | Dominance | `dreamer_multi_dominance_dataset.pkl`  |
-| 11 | DREAMER | Binary Classification      | Valence   | `dreamer_binary_valence_dataset.pkl`   |
-| 12 | DREAMER | Binary Classification      | Arousal   | `dreamer_binary_arousal_dataset.pkl`   |
-| 13 | DREAMER | Binary Classification      | Dominance | `dreamer_binary_dominance_dataset.pkl` |
+| #  | Dataset | Task Type                   | Dimension | Output File                            |
+| -- | ------- | --------------------------- | --------- | -------------------------------------- |
+| 1  | SEED    | Multi-Class Classification  | Emotion   | `seed_multi_emotion_dataset.pkl`       |
+| 2  | DEAP    | Multi-Class Classification  | Valence   | `deap_multi_valence_dataset.pkl`       |
+| 3  | DEAP    | Multi-Class Classification  | Arousal   | `deap_multi_arousal_dataset.pkl`       |
+| 4  | DEAP    | Multi-Class Classification  | Dominance | `deap_multi_dominance_dataset.pkl`     |
+| 5  | DEAP    | Binary-Class Classification | Valence   | `deap_binary_valence_dataset.pkl`      |
+| 6  | DEAP    | Binary-Class Classification | Arousal   | `deap_binary_arousal_dataset.pkl`      |
+| 7  | DEAP    | Binary-Class Classification | Dominance | `deap_binary_dominance_dataset.pkl`    |
+| 8  | DREAMER | Multi-Class Classification  | Valence   | `dreamer_multi_valence_dataset.pkl`    |
+| 9  | DREAMER | Multi-Class Classification  | Arousal   | `dreamer_multi_arousal_dataset.pkl`    |
+| 10 | DREAMER | Multi-Class Classification  | Dominance | `dreamer_multi_dominance_dataset.pkl`  |
+| 11 | DREAMER | Binary-Class Classification | Valence   | `dreamer_binary_valence_dataset.pkl`   |
+| 12 | DREAMER | Binary-Class Classification | Arousal   | `dreamer_binary_arousal_dataset.pkl`   |
+| 13 | DREAMER | Binary-Class Classification | Dominance | `dreamer_binary_dominance_dataset.pkl` |
 
 To generate all 13 preprocessed datasets, simply run the following scripts:
 
