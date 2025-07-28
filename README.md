@@ -9,7 +9,6 @@
 </p>
 <p align="center"><b>Figure 1.</b> Model Architecture of RBTransformer</p>
 
----
 
 ## 2. INSTALLATION, REQUIREMENTS AND SETUP 
 
@@ -49,12 +48,9 @@ To ensure scripts run correctly across environments, set the `PYTHONPATH` to the
   os.environ['PYTHONPATH'] = os.getcwd()
   ```
 
----
-
 ## 3. SCRIPTS
 
 ### I. PREPROCESSING DATASETS SCRIPTS
----
 
 RBTransformer is evaluated on three benchmark EEG datasets: SEED, DEAP, and DREAMER along their respective affective dimensions, for both Binary and Multi-Class Classification tasks.
 
@@ -101,8 +97,8 @@ python dataset_classes/seed_preprocessing.py
 
 This preprocesses the SEED dataset across the sole emotion dimension for multi-class classification, resulting in 1 `.pkl` file.
 
+
 ### II. TRAINING SCRIPTS
----
 
 RBTransformer was evaluated on the SEED, DEAP, and DREAMER datasets across their affective dimensions, emotion for SEED, and valence, arousal, dominance for DEAP and DREAMER, for both Binary and Multi-Class classification settings.
 
@@ -142,7 +138,6 @@ Replace the following:
 * `<WANDB_API_KEY>`: Your Weights & Biases API key (for logging training metrics)
 
 ### III. ABLATION SCRIPTS
----
 
 RBTransformer was ablated on the DREAMER dataset along the Arousal dimension for Binary Classification tasks.
 
@@ -178,14 +173,12 @@ Replace the following:
 
 * `<WANDB_API_KEY>`: Your Weights & Biases API key (for logging training metrics)
 
----
 
 ## 4. W&B: EXPERIMENT LOGS
 
 All training and ablation runs were logged using Weights & Biases, across all 5 folds of their respective experiments. The logged training configurations, evaluation metrics, and system details for all 13 training runs and 6 ablation runs can be accessed using the links below.
 
 ### I. TRAINING LOGS
----
 
 | #  | Dataset | Task Type                   | Dimension | W\&B Project Link                                                                                                                                       |
 | -- | ------- | --------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -204,7 +197,6 @@ All training and ablation runs were logged using Weights & Biases, across all 5 
 | 13 | DREAMER | Binary-Class Classification | Dominance | [View Logs](https://wandb.ai/nnilayy/%CE%B1-rbtransformer-eeg-recognition-dreamer-binary-dominance-class-classification-sota-run-0001?nw=nwusernnilayy) |
 
 ### II. ABLATION LOGS
----
 
 | # | Dataset | Task Type                   | Dimension | Ablation                             | W\&B Project Link                                                                                                                                                                     |
 | - | ------- | --------------------------- | --------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -215,14 +207,12 @@ All training and ablation runs were logged using Weights & Biases, across all 5 
 | 5 | DREAMER | Binary-Class Classification | Arousal   | Without Electrode Identity Embedding | [View Logs](https://wandb.ai/nnilayy/abl-%CE%B1-rbtransformer-eeg-recognition-dreamer-binary-arousal-class-classification-without-electrode-identity-embedding-0001?nw=nwusernnilayy) |
 | 6 | DREAMER | Binary-Class Classification | Arousal   | With ADASYN                          | [View Logs](https://wandb.ai/nnilayy/abl-%CE%B1-rbtransformer-eeg-recognition-dreamer-binary-arousal-class-classification-with-adasyn-0001?nw=nwusernnilayy)                          |
 
----
 
 ## 5. HUGGING FACE: MODEL CHECKPOINTS
 
 Similarly, all trained and ablated model checkpoints were saved on Hugging Face across all 5 folds of their respective experiments. The full set of pretrained weights—including fold-specific model checkpoints—for all 13 training runs and 6 ablation configurations can be accessed using the links below.
 
 ### I. TRAINED MODEL CHECKPOINTS
----
 
 | #  | Dataset | Task Type                   | Dimension | Hugging Face Collection Link                                                                                                             |
 | -- | ------- | --------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -241,7 +231,6 @@ Similarly, all trained and ablated model checkpoints were saved on Hugging Face 
 | 13 | DREAMER | Binary-Class Classification | Dominance | [View Model Collection](https://huggingface.co/collections/nnilayy/rbtransformer-dreamer-binary-dominance-weights-68846af96b4462ce01d72be9)        |
 
 ### II. ABLATION MODEL CHECKPOINTS
----
 
 | # | Dataset | Task Type                   | Dimension | Ablation                             | Hugging Face Collection Link                                                                                                                 |
 | - | ------- | --------------------------- | --------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -252,7 +241,6 @@ Similarly, all trained and ablated model checkpoints were saved on Hugging Face 
 | 5 | DREAMER | Binary-Class Classification | Arousal   | Without Electrode Identity Embedding | [View Model Collection](https://huggingface.co/collections/nnilayy/abl-w-o-eie-rbtransformer-dreamer-binary-arousal-68860734f0f7573b8ed81c87)          |
 | 6 | DREAMER | Binary-Class Classification | Arousal   | With ADASYN                          | [View Model Collection](https://huggingface.co/collections/nnilayy/abl-with-adasyn-rbtransformer-dreamer-binary-arousal-688605f7581ba118ab5ff380)      |
 
----
 
 ## 6. VISUALIZATIONS
 
@@ -268,7 +256,6 @@ To aid interpretability, we visualize both the learned feature representations a
 </p>
 <p align="center"><b>Figure 3b.</b> Confusion matrix illustrating prediction breakdown and misclassification patterns across emotion classes.</p>
 
----
 
 ## 7. CITATION
 
