@@ -207,7 +207,7 @@ All training and ablation runs were logged using Weights & Biases, across all 5 
 | 5 | DREAMER | Binary-Class Classification | Arousal   | Without Electrode Identity Embedding | [View Logs](https://wandb.ai/nnilayy/abl-%CE%B1-rbtransformer-eeg-recognition-dreamer-binary-arousal-class-classification-without-electrode-identity-embedding-0001?nw=nwusernnilayy) |
 | 6 | DREAMER | Binary-Class Classification | Arousal   | With ADASYN                          | [View Logs](https://wandb.ai/nnilayy/abl-%CE%B1-rbtransformer-eeg-recognition-dreamer-binary-arousal-class-classification-with-adasyn-0001?nw=nwusernnilayy)                          |
 
-Below is the bar plot visualization of the ablation results for the DREAMER dataset (Arousal dimension):
+Below is the bar plot visualization of the ablation results:
 
 <p align="center"> <img src="assets/ablations.png" alt="Ablation Study Visualization" width="100%"> </p> <p align="center"><b>Figure 5.</b> Ablation study for binary classification on the DREAMER dataset (Arousal dimension). Top: Impact of Inter-Cortical Attention. Bottom: Impact of training, regularization, and model components including Electrode Identity Embedding, ADASYN, SMOTE with label smoothing, weight decay, and dropout.</p>
 
