@@ -196,6 +196,34 @@ All training and ablation runs were logged using Weights & Biases, across all 5 
 | 12 | DREAMER | Binary-Class Classification | Arousal   | [View Logs](https://wandb.ai/nnilayy/%CE%B1-rbtransformer-eeg-recognition-dreamer-binary-arousal-class-classification-sota-run-0001?nw=nwusernnilayy)   |
 | 13 | DREAMER | Binary-Class Classification | Dominance | [View Logs](https://wandb.ai/nnilayy/%CE%B1-rbtransformer-eeg-recognition-dreamer-binary-dominance-class-classification-sota-run-0001?nw=nwusernnilayy) |
 
+> Below are the accuracy plots comparing previous state-of-the-art models with RBTransformer for each dataset under both binary-class and multi-class classification settings across their respective dimensions:
+
+<p align="center">
+  <img src="assets/accuracy_plots/seed_multi_accuracy_plot.png" alt="SEED Multi-Class Classification" width="100%">
+</p>
+<p align="center"><sub><b>Figure 3.</b> Model Benchmarking on SEED Dataset Under Multi-Class Classification Setting</sub></p>
+
+<p align="center">
+  <img src="assets/accuracy_plots/dreamer_binary_accuracy_plot.png" alt="DREAMER Binary Classification" width="100%">
+</p>
+<p align="center"><sub><b>Figure 4.</b> Model Benchmarking on DREAMER Dataset Under Binary Classification Setting</sub></p>
+
+<p align="center">
+  <img src="assets/accuracy_plots/deap_binary_accuracy_plot.png" alt="DEAP Binary Classification" width="100%">
+</p>
+<p align="center"><sub><b>Figure 5.</b> Model Benchmarking on DEAP Dataset Under Binary Classification Setting</sub></p>
+
+<p align="center">
+  <img src="assets/accuracy_plots/dreamer_multi_accuracy_plot.png" alt="DREAMER Multi-Class Classification" width="100%">
+</p>
+<p align="center"><sub><b>Figure 6.</b> Model Benchmarking on DREAMER Dataset Under Multi-Class Classification Setting</sub></p>
+
+<p align="center">
+  <img src="assets/accuracy_plots/deap_multi_accuracy_plot.png" alt="DEAP Multi-Class Classification" width="100%">
+</p>
+<p align="center"><sub><b>Figure 7.</b> Model Benchmarking on DEAP Dataset Under Multi-Class Classification Setting</sub></p>
+
+
 ### II. ABLATION LOGS
 
 | # | Dataset | Task Type                   | Dimension | Ablation                             | W\&B Project Link                                                                                                                                                                     |
@@ -212,7 +240,7 @@ Below is the bar plot visualization of the ablation results:
 <p align="center">
   <img src="assets/ablations.png" alt="Ablation Study Visualization" width="100%">
 </p>
-<p align="center"><sub><em><b>Figure 3.</b> Ablation study for binary classification on the DREAMER dataset (Arousal dimension). Top: Impact of Inter-Cortical Attention. Bottom: Impact of training, regularization, and model components including Electrode Identity Embedding, ADASYN, SMOTE with label smoothing, weight decay, and dropout.</em></sub></p>
+<p align="center"><sub><em><b>Figure 8.</b> Ablation study for binary classification on the DREAMER dataset (Arousal dimension). Top: Impact of Inter-Cortical Attention. Bottom: Impact of training, regularization, and model components including Electrode Identity Embedding, ADASYN, SMOTE with label smoothing, weight decay, and dropout.</em></sub></p>
 
 ## 5. HUGGING FACE: MODEL CHECKPOINTS
 
@@ -255,12 +283,12 @@ To aid interpretability, we visualize both the learned feature representations a
 <p align="center">
   <img src="assets/tsne-plots-rbtransformer.png" alt="t-SNE Plot" width="100%">
 </p>
-<p align="center"><sub><em><b>Figure 4a.</b> t-SNE visualization of RBTransformer’s latent feature space showing clear emotion-based clustering.</em></sub></p>
+<p align="center"><sub><em><b>Figure 9.</b> t-SNE visualization of RBTransformer’s latent feature space showing clear emotion-based clustering.</em></sub></p>
 
 <p align="center">
   <img src="assets/confusion-matrices.png" alt="Confusion Matrix" width="100%">
 </p>
-<p align="center"><sub><em><b>Figure 4b.</b> Confusion matrix illustrating prediction breakdown and misclassification patterns across emotion classes.</em></sub></p>
+<p align="center"><sub><em><b>Figure 10.</b> Confusion matrix illustrating prediction breakdown and misclassification patterns across emotion classes.</em></sub></p>
 
 
 ## 7. CITATION
