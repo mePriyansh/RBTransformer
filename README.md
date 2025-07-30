@@ -276,7 +276,41 @@ Similarly, all trained and ablated model checkpoints were saved on Hugging Face 
 | 6 | DREAMER | Binary-Class Classification | Arousal   | With ADASYN                          | [View Model Collection](https://huggingface.co/collections/nnilayy/abl-with-adasyn-rbtransformer-dreamer-binary-arousal-688605f7581ba118ab5ff380)      |
 
 
-## 6. VISUALIZATIONS
+## 6. INVERSE LOGARITHMIC STABILITY SCORE (ILSS)
+
+To assess a model's stability and consistency across cross-validation folds, in our paper we introduce a new metric: Inverse Logarithmic Stability Score (ILSS). ILSS jointly considers both the mean accuracy and the standard deviation of performance across folds, rewarding models that are not only accurate but also consistently reliable. It penalizes high variance and offers a bounded score between 0 and 10 to reflect the model’s reliability and stability across different data splits.
+
+$$
+\text{ILSS} = \frac{\sqrt{\mu}}{10} \cdot \min\left(-\log_{10} \left( \frac{\sigma}{1 + \lambda \cdot \mu^{2.5}} + \varepsilon \right), 10 \right)
+$$
+
+Where:
+
+* $\mu$ = Mean accuracy across folds (in %),
+* $\sigma$ = Standard deviation of accuracy across folds,
+* $\lambda = 71$ (stability scaling factor),
+* $\varepsilon = 10^{-10}$ (for numerical stability).
+
+To calculate the ILSS score for a model, use the following code snippet by providing its mean accuracy and standard deviation:
+
+```python
+from ilss.metric import ILSS
+
+ilss = ILSS()
+score = ilss.compute(mean_accuracy=99.96, std_dev=0.02)
+
+print(score)
+```
+
+We evaluated RBTransformer alongside previously proposed state-of-the-art models on the DREAMER dataset, along the Arousal dimension, for the binary classification setting. The resulting ILSS values for each model are plotted below to reflect their cross-fold stability and consistency.
+
+<p align="center">
+  <img src="assets\ilss_score_plot.png" alt="ILSS Score Comparison Across Models on DREAMER" width="100%">
+</p>
+<p align="center"><sub><em><b>Figure 11.</b> ILSS scores of RBTransformer and previous state-of-the-art models on the DREAMER dataset (Arousal dimension, Binary Classification). Higher scores indicate greater fold-wise reliability and consistency.</em></sub></p>
+
+
+## 7. VISUALIZATIONS
 
 To aid interpretability, we visualize both the learned feature representations and the model’s prediction behavior using t-SNE and confusion matrices.
 
@@ -291,6 +325,6 @@ To aid interpretability, we visualize both the learned feature representations a
 <p align="center"><sub><em><b>Figure 10.</b> Confusion matrix illustrating prediction breakdown and misclassification patterns across emotion classes.</em></sub></p>
 
 
-## 7. CITATION
+## 8. CITATION
 
 This work is currently under peer review. A citation will be added here as soon as the paper is accepted or published.
