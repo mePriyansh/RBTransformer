@@ -196,6 +196,73 @@ All training and ablation runs were logged using Weights & Biases, across all 5 
 | 12 | DREAMER | Binary-Class Classification | Arousal   | [View Logs](https://wandb.ai/nnilayy/%CE%B1-rbtransformer-eeg-recognition-dreamer-binary-arousal-class-classification-sota-run-0001?nw=nwusernnilayy)   |
 | 13 | DREAMER | Binary-Class Classification | Dominance | [View Logs](https://wandb.ai/nnilayy/%CE%B1-rbtransformer-eeg-recognition-dreamer-binary-dominance-class-classification-sota-run-0001?nw=nwusernnilayy) |
 
+
+The following tables provide a comparison of classification performance between RBTransformer and previously proposed models across the DEAP, DREAMER, and SEED datasets. Results are shown for each affective dimension (Valence, Arousal, Dominance) under both binary and multi-class classification settings, highlighting where RBTransformer performs competitively across tasks.
+
+
+### *Table I: Binary-Class Classification Performance Comparison on DEAP Dataset*
+
+| Model                    | Valence (%)      | Arousal (%)      | Dominance (%)    |
+| ------------------------ | ---------------- | ---------------- | ---------------- |
+| ACRNN                    | 93.72 ± 3.21     | 93.38 ± 3.73     | –                |
+| GANSER                   | 93.86 ± –        | 94.38 ± –        | –                |
+| 4D-CRNN                  | 94.22 ± 2.61     | 94.58 ± 3.69     | –                |
+| BiDCNN                   | 94.38 ± 2.61     | 94.72 ± 2.56     | –                |
+| CLDTA                    | 94.58 ± 1.40     | 94.11 ± 2.10     | –                |
+| DFCN                     | 94.59 ± –        | 95.32 ± –        | 94.78 ± –        |
+| RACNN                    | 96.65 ± 2.65     | 97.11 ± 2.01     | –                |
+| 4D-ANN                   | 96.90 ± 1.65     | 97.39 ± 1.75     | –                |
+| TRPO-NET                 | 97.87 ± 1.89     | 98.08 ± 1.83     | 98.33 ± 1.55     |
+| TDMNN                    | 98.08 ± 2.13     | 98.25 ± 2.85     | –                |
+| **RBTransformer (Ours)** | **99.84 ± 0.02** | **99.83 ± 0.05** | **99.82 ± 0.06** |
+
+
+### *Table II: Binary-Class Classification Performance Comparison on DREAMER Dataset*
+
+| Model                    | Valence (%)      | Arousal (%)      | Dominance (%)    |
+| ------------------------ | ---------------- | ---------------- | ---------------- |
+| GANSER                   | 85.28 ± –        | 84.16 ± –        | –                |
+| DGCNN                    | 86.23 ± 12.29    | 84.54 ± 10.18    | 85.02 ± 10.25    |
+| DFCN                     | 93.15 ± –        | 91.30 ± –        | 92.04 ± –        |
+| RACNN                    | 95.55 ± 2.18     | 97.01 ± 2.74     | –                |
+| ACRNN                    | 97.93 ± 1.73     | 97.98 ± 1.92     | 98.23 ± 1.42     |
+| BiDCNN                   | 98.35 ± 0.87     | 98.66 ± 1.46     | 99.01 ± 0.96     |
+| TRPO-NET                 | 98.86 ± 0.57     | 98.97 ± 0.49     | 98.93 ± 0.69     |
+| TDMNN                    | 99.45 ± 0.91     | 99.51 ± 0.79     | –                |
+| **RBTransformer (Ours)** | **99.61 ± 0.05** | **99.74 ± 0.06** | **99.79 ± 0.04** |
+
+
+### *Table III: Multi-Class Classification Performance Comparison on SEED Dataset*
+
+| Model                    | Accuracy (%)     |
+| ------------------------ | ---------------- |
+| DGCNN                    | 90.40 ± 8.49     |
+| 4D-CRNN                  | 94.74 ± 2.32     |
+| CLDTA                    | 95.09 ± 4.48     |
+| SST-EmotionNet           | 96.02 ± 2.17     |
+| 4D-ANN                   | 96.25 ± 1.86     |
+| TDMNN                    | 97.20 ± 1.57     |
+| 3DCANN                   | 97.35 ± –        |
+| GANSER                   | 97.71 ± –        |
+| **RBTransformer (Ours)** | **99.51 ± 0.02** |
+
+
+### *Table IV: Multi-Class Classification Performance Comparison on DEAP Dataset*
+
+| Model                    | Valence (%)      | Arousal (%)      | Dominance (%)    |
+| ------------------------ | ---------------- | ---------------- | ---------------- |
+| TRPO-NET                 | 97.63 ± 2.38     | 97.74 ± 2.26     | 97.88 ± 2.24     |
+| **RBTransformer (Ours)** | **99.87 ± 0.04** | **99.84 ± 0.04** | **99.87 ± 0.05** |
+
+
+### *Table V: Multi-Class Classification Performance Comparison on DREAMER Dataset*
+
+| Model                    | Valence (%)      | Arousal (%)      | Dominance (%)    |
+| ------------------------ | ---------------- | ---------------- | ---------------- |
+| TRPO-NET                 | 98.18 ± 0.97     | 98.37 ± 0.93     | 98.40 ± 0.80     |
+| **RBTransformer (Ours)** | **99.54 ± 0.06** | **99.55 ± 0.04** | **99.60 ± 0.05** |
+
+
 > Below are the accuracy plots comparing previous state-of-the-art models with RBTransformer for each dataset under both binary-class and multi-class classification settings across their respective dimensions:
 
 <p align="center">
