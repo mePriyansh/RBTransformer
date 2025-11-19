@@ -394,4 +394,21 @@ To aid interpretability, we visualize both the learned feature representations a
 
 ## 8. CITATION
 
-This work is currently under peer review. A citation will be added here as soon as the paper is accepted or published.
+
+
+
+
+This work is published as an **arXiv preprint** and is currently under **peer review for IEEE Transactions on Affective Computing (TAC)**. If you would like to cite our paper, please use the following BibTeX entry: 
+
+```bibtex
+@misc{kumar2025brainwaveencodesthousand,
+      title={A Brain Wave Encodes a Thousand Tokens: Modeling Inter-Cortical Neural Interactions for Effective EEG-based Emotion Recognition},
+      author={Nilay Kumar and Priyansh Bhandari and G. Maragatham},
+      year={2025},
+      eprint={2511.13954},
+      archivePrefix={arXiv},
+      primaryClass={q-bio.NC},
+      url={https://arxiv.org/abs/2511.13954},
+}
+```
+ 
