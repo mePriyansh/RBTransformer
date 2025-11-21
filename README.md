@@ -1,5 +1,19 @@
 <h1 align="center"><i>RBTransformer</i></h1>
 
+<div align='center'>
+
+<a href="https://arxiv.org/abs/2511.13954" target="_blank">
+    <img alt="arXiv" 
+         src="https://img.shields.io/badge/Paper-arXiv%3A2511.13954-red?logo=arxiv" 
+         height="20" />
+</a>
+<a href="https://huggingface.co/nnilayy/collections" target="_blank">
+    <img alt="RBTransformer Model Weights Collection" 
+         src="https://img.shields.io/badge/%F0%9F%A4%97%20_Model-RBTransformer%20Model%20Weights%20Collection-ffc107?color=ffc107&logoColor=white" 
+         height="20" />
+</a>
+
+</div>
 <p align="center"><strong>Official PyTorch codebase of RBTransformer from our paper:<br>
 <em>“A Brain Wave Encodes a Thousand Tokens: Modeling Inter-Cortical Neural Interactions for Effective EEG-Based Emotion Recognition”</em></strong></p>
 
