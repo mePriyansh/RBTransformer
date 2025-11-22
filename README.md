@@ -4,7 +4,7 @@
 
 <a href="https://arxiv.org/abs/2511.13954" target="_blank">
     <img alt="arXiv" 
-         src="https://img.shields.io/badge/Paper-arXiv%3A2511.13954-red?logo=arxiv" 
+         src="https://img.shields.io/badge/arXiv%3A2511.13954-b31b1b?logo=arxiv" 
          height="20" />
 </a>
 
