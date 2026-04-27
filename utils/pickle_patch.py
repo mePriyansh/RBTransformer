@@ -1,6 +1,6 @@
 import sys
 import types
-from dataset_classes import DEAP, DREAMER, SEED
+from dataset_classes import DEAP, DREAMER, SEED, PhysioNetMI
 
 from preprocessing.transformations import (
     DatasetReshape,
@@ -24,6 +24,7 @@ def patch_pickle_loading():
     dataset_main.DEAP = DEAP
     dataset_main.DREAMER = DREAMER
     dataset_main.SEED = SEED
+    dataset_main.PhysioNetMI = PhysioNetMI
 
     dataset_main.DatasetReshape = DatasetReshape
     dataset_main.subtract_by_one = subtract_by_one
