@@ -7,27 +7,33 @@ import numpy as np
 import torch.nn as nn
 from tqdm import tqdm
 from utils.seed import set_seed
+from huggingface_hub import login
 from model.model import RBTransformer
 from torch.utils.data import DataLoader
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
+from utils.push_to_hf import push_model_to_hub
 import torch.optim.lr_scheduler as lr_scheduler
 from utils.messages import success, fail
 from utils.pickle_patch import patch_pickle_loading
 from preprocessing.transformations import DatasetReshape
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
+################################################################################
+# ARGPARSE CONFIGURATION
+################################################################################
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="RBTransformer Transfer Learning on PhysioNet MI"
+        description="RBTransformer Transfer Learning Training Script"
     )
     parser.add_argument(
         "--mode",
         type=str,
         required=True,
         choices=["scratch", "finetune", "frozen"],
-        help="scratch: random init | finetune: load SEED weights, train all | frozen: load SEED weights, freeze encoder",
+        help="scratch: random init | finetune: load pretrained weights, train all | frozen: load pretrained weights, freeze encoder",
     )
     parser.add_argument(
         "--data_fraction",
@@ -40,7 +46,7 @@ def parse_args():
         "--pretrained_path",
         type=str,
         default=None,
-        help="Path to SEED pretrained model directory (required for finetune/frozen)",
+        help="HuggingFace repo ID or local path to pretrained model (required for finetune/frozen)",
     )
     parser.add_argument(
         "--dataset_path",
@@ -52,14 +58,20 @@ def parse_args():
         "--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu"
     )
     parser.add_argument("--num_workers", type=int, default=8)
-    parser.add_argument("--wandb_api_key", type=str, default=None)
-    parser.add_argument("--num_epochs", type=int, default=300)
+    parser.add_argument("--hf_username", type=str, required=True)
+    parser.add_argument("--hf_token", type=str, required=True)
+    parser.add_argument("--wandb_api_key", type=str, required=True)
     return parser.parse_args()
+
+
+################################################################################
+# TRANSFER LEARNING UTILITIES
+################################################################################
 
 
 def load_pretrained_encoder(model, pretrained_path):
     """
-    Loads SEED-pretrained weights into the encoder (BDE projection + transformer blocks).
+    Loads pretrained weights into the encoder (BDE projection + transformer blocks).
     Electrode identity embedding and classification head are left as random init
     since they differ in shape (62->64 electrodes, 3->4 classes).
     """
@@ -86,7 +98,7 @@ def load_pretrained_encoder(model, pretrained_path):
 
     model.load_state_dict(model_state)
 
-    print(success(f"Transferred {len(transferred_keys)} parameter tensors from SEED pretrained model"))
+    print(success(f"Transferred {len(transferred_keys)} parameter tensors from pretrained model"))
     print(f"  Transferred: {transferred_keys}")
     print(f"  Skipped (reinitialized): {skipped_keys}")
 
@@ -114,47 +126,118 @@ def freeze_encoder(model):
     return model
 
 
+################################################################################
+# MAIN-FUNCTION
+################################################################################
 def main():
     args = parse_args()
 
     if args.mode in ["finetune", "frozen"] and args.pretrained_path is None:
         raise ValueError("--pretrained_path is required for finetune/frozen modes")
 
-    NUM_ELECTRODES = 64
-    NUM_CLASSES = 4
-    BDE_DIM = 4
-    EMBED_DIM = 128
-    DEPTH = 4
-    HEADS = 6
-    HEAD_DIM = 32
-    MLP_HIDDEN_DIM = 128
-    DROPOUT = 0.1
+    ################################################################################
+    # RUN-CONFIG
+    ################################################################################
+    DATA_FRACTION = args.data_fraction
+    MODE = args.mode
+    run_name = f"physionet-mi-{MODE}-data{int(DATA_FRACTION*100)}pct"
 
-    NUM_EPOCHS = args.num_epochs
-    INITIAL_BATCH_SIZE = 256
-    REDUCED_BATCH_SIZE = 64
-    INITIAL_LEARNING_RATE = 1e-3
-    MINIMUM_LEARNING_RATE = 1e-6
-    WEIGHT_DECAY = 1e-3
-    LABEL_SMOOTHING = 0.12
-    DATA_DROP_RATIO = 0.10
+    print(
+        success(
+            f"Training Initialized => Dataset: PHYSIONET_MI || Mode: {MODE.capitalize()} || Data: {int(DATA_FRACTION*100)}%"
+        )
+    )
 
+    ################################################################################
+    # SEED CONFIG
+    ################################################################################
     SEED_VAL = args.seed
     set_seed(SEED_VAL)
+    print(success(f"Seed value set for training run: {SEED_VAL}"))
+
+    ################################################################################
+    # TRAINING-HYPERPARAMETERS
+    ################################################################################
+    NUM_EPOCHS = 100
+
+    INITIAL_BATCH_SIZE = 256
+
+    REDUCED_BATCH_SIZE = 64
+
+    INITIAL_LEARNING_RATE = 1e-3
+
+    MINIMUM_LEARNING_RATE = 1e-6
+
+    WEIGHT_DECAY = 1e-3
+
+    LABEL_SMOOTHING = 0.12
+
+    NUM_WORKERS = args.num_workers
+
+    DATA_DROP_RATIO = 0.10
+
+    ################################################################################
+    # MODEL-CONFIG
+    ################################################################################
+    NUM_ELECTRODES = 64
+
+    NUM_CLASSES = 4
+
+    BDE_DIM = 4
+
+    EMBED_DIM = 128
+
+    DEPTH = 4
+
+    HEADS = 6
+
+    HEAD_DIM = 32
+
+    MLP_HIDDEN_DIM = 128
+
+    DROPOUT = 0.1
+
     DEVICE = torch.device(args.device)
+    print(success(f"Device Set: {DEVICE}"))
 
-    run_name = f"physionet-mi-{args.mode}-data{int(args.data_fraction*100)}pct"
-    print(success(f"Run: {run_name} | Device: {DEVICE}"))
+    ################################################################################
+    #  WANDB & HUGGINGFACE CONFIG
+    ################################################################################
+    try:
+        wandb.login(key=args.wandb_api_key)
+        print(success("Success: WandB API key authenticated."))
+    except Exception as e:
+        print(fail("Failed: WandB API key authentication failed."))
+        raise e
 
+    WANDB_RUN_NAME = f"α-rbtransformer-transfer-{run_name}"
+
+    try:
+        login(token=args.hf_token)
+        print(success("Success: Hugging Face token authenticated."))
+    except Exception as e:
+        print(fail("Failed: Hugging Face token authentication failed."))
+        raise e
+
+    USERNAME = args.hf_username
+    HF_REPO_ID = f"{USERNAME}/{run_name}"
+
+    ################################################################################
+    # LOAD PREPROCESSED DATASET
+    ################################################################################
     patch_pickle_loading()
+
     try:
         with open(args.dataset_path, "rb") as f:
             dataset = pickle.load(f)
-        print(success(f"Dataset loaded: {len(dataset)} samples"))
+        print(success(f"Success: Dataset '{args.dataset_path}' successfully loaded"))
     except Exception as e:
-        print(fail(f"Failed to load dataset: {args.dataset_path}"))
+        print(fail(f"Failed: Dataset '{args.dataset_path}' failed to load"))
         raise e
 
+    ################################################################################
+    # REGULARIZATION: DATA DROPOUT
+    ################################################################################
     X_full = []
     y_full = []
     for i in range(len(dataset)):
@@ -168,33 +251,42 @@ def main():
     num_samples = len(X_full)
     drop_count = int(num_samples * DATA_DROP_RATIO)
     all_indices = np.arange(num_samples)
+
     np.random.shuffle(all_indices)
     kept_indices = all_indices[drop_count:]
     X_full = X_full[kept_indices]
     y_full = y_full[kept_indices]
 
-    X_train, X_test, y_train, y_test = train_test_split(
+    ################################################################################
+    # TRAIN/TEST SPLIT
+    ################################################################################
+    X_train, X_val, y_train, y_val = train_test_split(
         X_full, y_full, test_size=0.2, random_state=SEED_VAL, stratify=y_full
     )
 
-    if args.data_fraction < 1.0:
-        n_keep = int(len(X_train) * args.data_fraction)
+    if DATA_FRACTION < 1.0:
+        n_keep = int(len(X_train) * DATA_FRACTION)
         indices = np.random.choice(len(X_train), n_keep, replace=False)
         X_train = X_train[indices]
         y_train = y_train[indices]
-        print(success(f"Using {args.data_fraction*100:.0f}% of training data: {len(X_train)} samples"))
+        print(success(f"Using {DATA_FRACTION*100:.0f}% of training data: {len(X_train)} samples"))
 
     smote = SMOTE(random_state=SEED_VAL)
     X_train_balanced, y_train_balanced = smote.fit_resample(X_train, y_train)
-    print(success(f"After SMOTE: {len(X_train_balanced)} train samples, {len(X_test)} test samples"))
 
     train_dataset = DatasetReshape(X_train_balanced, y_train_balanced, NUM_ELECTRODES)
-    test_dataset = DatasetReshape(X_test, y_test, NUM_ELECTRODES)
+    val_dataset = DatasetReshape(X_val, y_val, NUM_ELECTRODES)
 
-    test_loader = DataLoader(
-        test_dataset, batch_size=INITIAL_BATCH_SIZE, shuffle=False, num_workers=args.num_workers
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=INITIAL_BATCH_SIZE,
+        shuffle=False,
+        num_workers=NUM_WORKERS,
     )
 
+    ################################################################################
+    # MODEL INIT + TRANSFER LEARNING
+    ################################################################################
     model = RBTransformer(
         num_electrodes=NUM_ELECTRODES,
         bde_dim=BDE_DIM,
@@ -207,10 +299,10 @@ def main():
         num_classes=NUM_CLASSES,
     )
 
-    if args.mode in ["finetune", "frozen"]:
+    if MODE in ["finetune", "frozen"]:
         model = load_pretrained_encoder(model, args.pretrained_path)
 
-    if args.mode == "frozen":
+    if MODE == "frozen":
         model = freeze_encoder(model)
 
     model = model.to(DEVICE)
@@ -225,32 +317,37 @@ def main():
         optimizer, T_max=NUM_EPOCHS, eta_min=MINIMUM_LEARNING_RATE
     )
 
-    if args.wandb_api_key:
-        wandb.login(key=args.wandb_api_key)
-        wandb.init(
-            project="rbtransformer-transfer-learning",
-            name=run_name,
-            config={
-                "mode": args.mode,
-                "data_fraction": args.data_fraction,
-                "num_epochs": NUM_EPOCHS,
-                "num_electrodes": NUM_ELECTRODES,
-                "num_classes": NUM_CLASSES,
-                "pretrained_path": args.pretrained_path,
-            },
-        )
+    wandb.init(
+        project=WANDB_RUN_NAME,
+        group=f"physionet_mi-{MODE}",
+        name=run_name,
+        config={
+            "learning_rate": INITIAL_LEARNING_RATE,
+            "minimum_learning_rate": MINIMUM_LEARNING_RATE,
+            "num_epochs": NUM_EPOCHS,
+            "model": "RBTransformer",
+            "mode": MODE,
+            "data_fraction": DATA_FRACTION,
+            "optimizer": "AdamW",
+            "scheduler": "CosineAnnealingLR",
+            "pretrained_path": args.pretrained_path,
+        },
+    )
 
-    best_val_accuracy = 0.0
-    best_metrics = {}
-
+    ################################################################################
+    # TRAINING
+    ################################################################################
     for epoch in range(NUM_EPOCHS):
-        current_batch_size = INITIAL_BATCH_SIZE if epoch < 150 else REDUCED_BATCH_SIZE
+        if epoch < 50:
+            current_batch_size = INITIAL_BATCH_SIZE
+        else:
+            current_batch_size = REDUCED_BATCH_SIZE
 
         train_loader = DataLoader(
             train_dataset,
             batch_size=current_batch_size,
             shuffle=True,
-            num_workers=args.num_workers,
+            num_workers=NUM_WORKERS,
         )
 
         model.train()
@@ -258,7 +355,10 @@ def main():
         train_correct = 0
         train_total = 0
 
-        for batch in tqdm(train_loader, desc=f"Epoch {epoch + 1}/{NUM_EPOCHS} - Training"):
+        for batch in tqdm(
+            train_loader,
+            desc=f"Epoch {epoch + 1}/{NUM_EPOCHS} - Training",
+        ):
             x, y = batch
             x, y = x.to(DEVICE), y.to(DEVICE)
             optimizer.zero_grad()
@@ -283,35 +383,30 @@ def main():
         all_targets = []
 
         with torch.no_grad():
-            for batch in test_loader:
+            for batch in val_loader:
                 x, y = batch
                 x, y = x.to(DEVICE), y.to(DEVICE)
                 outputs = model(x)
                 loss = criterion(outputs, y)
                 val_loss += loss.item()
                 _, predicted = torch.max(outputs, 1)
+
                 all_preds.extend(predicted.cpu().numpy())
                 all_targets.extend(y.cpu().numpy())
 
-        avg_val_loss = val_loss / len(test_loader)
+        avg_val_loss = val_loss / len(val_loader)
+
         val_accuracy = accuracy_score(all_targets, all_preds)
-        precision = precision_score(all_targets, all_preds, average="macro", zero_division=0)
-        recall = recall_score(all_targets, all_preds, average="macro", zero_division=0)
+        precision = precision_score(
+            all_targets, all_preds, average="macro", zero_division=0
+        )
+        recall = recall_score(
+            all_targets, all_preds, average="macro", zero_division=0
+        )
         f1 = f1_score(all_targets, all_preds, average="macro", zero_division=0)
 
-        if val_accuracy > best_val_accuracy:
-            best_val_accuracy = val_accuracy
-            best_metrics = {
-                "epoch": epoch + 1,
-                "accuracy": val_accuracy,
-                "precision": precision,
-                "recall": recall,
-                "f1_score": f1,
-            }
-            torch.save(model.state_dict(), f"best_model_{run_name}.pt")
-
-        if args.wandb_api_key:
-            wandb.log({
+        wandb.log(
+            {
                 "epoch": epoch + 1,
                 "train_loss": avg_train_loss,
                 "train_accuracy": train_accuracy,
@@ -321,26 +416,28 @@ def main():
                 "recall": recall,
                 "f1_score": f1,
                 "lr": optimizer.param_groups[0]["lr"],
-                "batch_size": current_batch_size,
-            })
+                "train_batch_size": current_batch_size,
+            }
+        )
 
         tqdm.write(f"\nEpoch {epoch + 1}/{NUM_EPOCHS}")
-        tqdm.write(f"Train Loss: {avg_train_loss:.4f} | Train Acc: {train_accuracy:.4f}")
-        tqdm.write(f"Val Loss: {avg_val_loss:.4f} | Val Acc: {val_accuracy:.4f}")
-        tqdm.write(f"P: {precision:.4f} | R: {recall:.4f} | F1: {f1:.4f}")
+        tqdm.write(f"Train Loss     : {avg_train_loss:.4f}")
+        tqdm.write(f"Train Accuracy : {train_accuracy:.4f}")
+        tqdm.write(f"Val Loss       : {avg_val_loss:.4f}")
+        tqdm.write(f"Val Accuracy   : {val_accuracy:.4f}")
+        tqdm.write(f"Precision      : {precision:.4f}")
+        tqdm.write(f"Recall         : {recall:.4f}")
+        tqdm.write(f"F1 Score       : {f1:.4f}")
+        tqdm.write(f"Learning Rate  : {optimizer.param_groups[0]['lr']:.6f}")
+        tqdm.write(f"Batch Size     : {current_batch_size}")
 
-    print("\n" + "=" * 60)
-    print(success(f"FINAL RESULTS: {run_name}"))
-    print(f"  Best Accuracy:  {best_metrics['accuracy']:.4f}")
-    print(f"  Best Precision: {best_metrics['precision']:.4f}")
-    print(f"  Best Recall:    {best_metrics['recall']:.4f}")
-    print(f"  Best F1 Score:  {best_metrics['f1_score']:.4f}")
-    print(f"  Best Epoch:     {best_metrics['epoch']}")
-    print("=" * 60)
+    push_model_to_hub(
+        model=model,
+        repo_id=HF_REPO_ID,
+        commit_message=f"Upload of trained RBTransformer: {run_name}",
+    )
 
-    if args.wandb_api_key:
-        wandb.log({"best_accuracy": best_metrics["accuracy"], "best_f1": best_metrics["f1_score"]})
-        wandb.finish()
+    wandb.finish()
 
 
 if __name__ == "__main__":
