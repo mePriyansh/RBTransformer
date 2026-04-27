@@ -30,7 +30,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="RBTransformer EEG Training Script")
     parser.add_argument("--root_dir", type=str, default="preprocessed_datasets")
     parser.add_argument(
-        "--dataset_name", type=str, required=True, choices=["seed", "deap", "dreamer"]
+        "--dataset_name", type=str, required=True, choices=["seed", "deap", "dreamer", "physionet_mi"]
     )
     parser.add_argument(
         "--task_type", type=str, required=True, choices=["binary", "multi"]
@@ -84,6 +84,11 @@ def main():
         "seed": {
             "multi": {
                 "emotion": "seed_multi_emotion_dataset.pkl",
+            },
+        },
+        "physionet_mi": {
+            "multi": {
+                "motor_imagery": "physionet_mi_multi_motor_imagery_dataset.pkl",
             },
         },
     }

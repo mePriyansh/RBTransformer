@@ -1,6 +1,10 @@
 import numpy as np
 from collections import defaultdict
-from tqdm.notebook import tqdm
+try:
+    get_ipython()
+    from tqdm.notebook import tqdm
+except NameError:
+    from tqdm import tqdm
 from tqdm_joblib import tqdm_joblib
 from joblib import Parallel, delayed
 from torch.utils.data import Dataset

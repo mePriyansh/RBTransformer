@@ -6,6 +6,7 @@ def get_num_electrodes(dataset):
         "seed": 62,
         "deap": 32,
         "dreamer": 14,
+        "physionet_mi": 64,
     }[dataset]
 
 
@@ -19,5 +20,7 @@ def get_num_classes(dataset, task_type):
         return 2 if task_type == "binary" else 9
     elif dataset == "dreamer":
         return 2 if task_type == "binary" else 5
+    elif dataset == "physionet_mi":
+        return 4
     else:
         raise ValueError(f"Unsupported dataset: {dataset}")
