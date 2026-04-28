@@ -31,11 +31,11 @@ class PhysioNetMI(BaseDatasetPreprocessing):
     def __init__(
         self,
         root_path: str = "./physionet_mi_data/physionet.org/files/eegmmidb/1.0.0",
-        trial_window_size: int = 640,
+        trial_window_size: int = 256,
         num_channels: int = 64,
-        stride: int = 320,
+        stride: int = 32,
         label_transform: Union[None, Callable] = None,
-        num_workers: int = 0,
+        num_workers: int = 8,
     ):
         super().__init__(
             root_path=root_path,
@@ -188,11 +188,11 @@ if __name__ == "__main__":
     print("Starting PhysioNet MI preprocessing (4-class motor imagery)...")
     physionet_mi_dataset = PhysioNetMI(
         root_path="./physionet_mi_data/physionet.org/files/eegmmidb/1.0.0",
-        trial_window_size=640,
+        trial_window_size=256,
         num_channels=64,
-        stride=320,
+        stride=32,
         label_transform=label_transform,
-        num_workers=0,
+        num_workers=8,
     )
 
     print(f"Total samples: {len(physionet_mi_dataset)}")
