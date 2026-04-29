@@ -32,8 +32,13 @@ def parse_args():
         "--mode",
         type=str,
         required=True,
-        choices=["scratch", "finetune", "frozen"],
-        help="scratch: random init | finetune: load pretrained weights, train all | frozen: load pretrained weights, freeze encoder",
+        choices=["scratch", "finetune", "frozen", "soup"],
+        help=(
+            "scratch: random init | "
+            "finetune: load pretrained weights, train all | "
+            "frozen: load pretrained weights, freeze encoder | "
+            "soup: load full merged-teacher checkpoint (all weights) and train all"
+        ),
     )
     parser.add_argument(
         "--data_fraction",
@@ -67,6 +72,35 @@ def parse_args():
 ################################################################################
 # TRANSFER LEARNING UTILITIES
 ################################################################################
+
+
+def load_full_checkpoint(model, pretrained_path):
+    """
+    Loads ALL weights from a checkpoint that already matches the student's
+    target shape (e.g., a merged-teacher 'soup' checkpoint produced by
+    merge_teachers.py). Unlike load_pretrained_encoder, this transfers the
+    electrode identity embedding and the deep classification head as well,
+    relying on the producer of the checkpoint to have shaped everything to
+    match the student.
+    """
+    pretrained = RBTransformer.from_pretrained(pretrained_path)
+    pretrained_state = pretrained.state_dict()
+    model_state = model.state_dict()
+
+    transferred_keys = []
+    skipped_keys = []
+    for key, value in pretrained_state.items():
+        if key in model_state and model_state[key].shape == value.shape:
+            model_state[key] = value
+            transferred_keys.append(key)
+        else:
+            skipped_keys.append(key)
+
+    model.load_state_dict(model_state)
+    print(success(f"Soup init: transferred {len(transferred_keys)} parameter tensors from {pretrained_path}"))
+    if skipped_keys:
+        print(f"  Skipped (shape mismatch or missing in student): {skipped_keys}")
+    return model
 
 
 def load_pretrained_encoder(model, pretrained_path):
@@ -132,8 +166,8 @@ def freeze_encoder(model):
 def main():
     args = parse_args()
 
-    if args.mode in ["finetune", "frozen"] and args.pretrained_path is None:
-        raise ValueError("--pretrained_path is required for finetune/frozen modes")
+    if args.mode in ["finetune", "frozen", "soup"] and args.pretrained_path is None:
+        raise ValueError("--pretrained_path is required for finetune/frozen/soup modes")
 
     ################################################################################
     # RUN-CONFIG
@@ -304,6 +338,9 @@ def main():
 
     if MODE == "frozen":
         model = freeze_encoder(model)
+
+    if MODE == "soup":
+        model = load_full_checkpoint(model, args.pretrained_path)
 
     model = model.to(DEVICE)
 
